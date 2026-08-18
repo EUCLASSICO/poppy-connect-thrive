@@ -21,13 +21,17 @@ export const countries: Country[] = [
   "Guiné Equatorial",
 ];
 
+export type KycStatus = "não verificado" | "pendente" | "verificado";
+
 export type PoppyUser = {
   id: string;
   fullName: string;
   username: string;
   email: string;
+  secondaryEmail?: string;
   country: Country;
   password: string;
+  kycStatus: KycStatus;
 };
 
 const USERS_KEY = "poppy_users";
@@ -61,13 +65,40 @@ export function isUsernameTaken(username: string): boolean {
   return readUsers().some((u) => u.username.toLowerCase() === username.toLowerCase());
 }
 
-export function createUser(data: Omit<PoppyUser, "id">): PoppyUser {
-  const user: PoppyUser = { ...data, id: generateUserId() };
+export function createUser(data: Omit<PoppyUser, "id" | "kycStatus">): PoppyUser {
+  const user: PoppyUser = { ...data, id: generateUserId(), kycStatus: "não verificado" };
   const users = readUsers();
   users.push(user);
   writeUsers(users);
   window.localStorage.setItem(SESSION_KEY, user.id);
   return user;
+}
+
+function updateUser(id: string, patch: Partial<PoppyUser>): PoppyUser | null {
+  const users = readUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+  users[index] = { ...users[index], ...patch };
+  writeUsers(users);
+  return users[index];
+}
+
+/** Troca a senha, validando a senha atual */
+export function changePassword(id: string, currentPassword: string, newPassword: string): boolean {
+  const user = readUsers().find((u) => u.id === id);
+  if (!user || user.password !== currentPassword) return false;
+  updateUser(id, { password: newPassword });
+  return true;
+}
+
+/** Define ou atualiza o Gmail secundário de recuperação */
+export function setSecondaryEmail(id: string, secondaryEmail: string): PoppyUser | null {
+  return updateUser(id, { secondaryEmail });
+}
+
+/** Envia o pedido de verificação KYC (mock — passa a "pendente") */
+export function submitKyc(id: string): PoppyUser | null {
+  return updateUser(id, { kycStatus: "pendente" });
 }
 
 /** Autentica por ID ou por email (Gmail) + senha */

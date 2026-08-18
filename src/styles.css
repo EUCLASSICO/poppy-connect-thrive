@@ -67,9 +67,9 @@
   --card-foreground: oklch(0.2 0.018 40);
   --popover: oklch(0.99 0.005 75);
   --popover-foreground: oklch(0.2 0.018 40);
-  --primary: oklch(0.53 0.21 27);
+  --primary: oklch(0.577 0.245 27.3);
   --primary-foreground: oklch(0.99 0.008 75);
-  --primary-soft: oklch(0.93 0.045 30);
+  --primary-soft: oklch(0.94 0.05 27);
   --secondary: oklch(0.94 0.012 70);
   --secondary-foreground: oklch(0.28 0.02 45);
   --muted: oklch(0.94 0.012 70);
@@ -85,27 +85,27 @@
   --destructive-foreground: oklch(0.99 0.006 25);
   --border: oklch(0.89 0.014 60);
   --input: oklch(0.89 0.014 60);
-  --ring: oklch(0.53 0.21 27);
-  --chart-1: oklch(0.53 0.21 27);
+  --ring: oklch(0.577 0.245 27.3);
+  --chart-1: oklch(0.577 0.245 27.3);
   --chart-2: oklch(0.34 0.09 258);
   --chart-3: oklch(0.58 0.13 148);
   --chart-4: oklch(0.74 0.14 78);
   --chart-5: oklch(0.5 0.02 50);
   --sidebar: oklch(0.99 0.005 75);
   --sidebar-foreground: oklch(0.2 0.018 40);
-  --sidebar-primary: oklch(0.53 0.21 27);
+  --sidebar-primary: oklch(0.577 0.245 27.3);
   --sidebar-primary-foreground: oklch(0.99 0.008 75);
   --sidebar-accent: oklch(0.94 0.012 70);
   --sidebar-accent-foreground: oklch(0.28 0.02 45);
   --sidebar-border: oklch(0.89 0.014 60);
-  --sidebar-ring: oklch(0.53 0.21 27);
+  --sidebar-ring: oklch(0.577 0.245 27.3);
 
   /* Gradientes discretos, dentro da mesma família de cor (luz sobre tinta),
      em vez do clássico roxo→rosa que denuncia template de IA. */
-  --gradient-primary: radial-gradient(140% 140% at 15% 0%, oklch(0.6 0.19 27), oklch(0.47 0.2 22));
+  --gradient-primary: radial-gradient(140% 140% at 15% 0%, oklch(0.66 0.22 27.3), oklch(0.5 0.24 25));
   --gradient-accent: radial-gradient(140% 140% at 15% 0%, oklch(0.4 0.09 258), oklch(0.28 0.08 255));
   --shadow-card: 0 1px 2px oklch(0.2 0.018 40 / 0.05), 0 6px 20px -12px oklch(0.2 0.018 40 / 0.16);
-  --shadow-float: 0 12px 32px -10px oklch(0.53 0.21 27 / 0.32);
+  --shadow-float: 0 12px 32px -10px oklch(0.577 0.245 27.3 / 0.35);
 
   /* Textura de papel — muito subtil, dá o toque "feito à mão" sem pesar */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
@@ -118,9 +118,9 @@
   --card-foreground: oklch(0.96 0.008 75);
   --popover: oklch(0.21 0.018 40);
   --popover-foreground: oklch(0.96 0.008 75);
-  --primary: oklch(0.64 0.19 27);
+  --primary: oklch(0.66 0.22 27.3);
   --primary-foreground: oklch(0.15 0.02 27);
-  --primary-soft: oklch(0.3 0.06 27);
+  --primary-soft: oklch(0.32 0.08 27);
   --secondary: oklch(0.27 0.016 45);
   --secondary-foreground: oklch(0.96 0.008 75);
   --muted: oklch(0.27 0.016 45);
@@ -136,15 +136,15 @@
   --destructive-foreground: oklch(0.15 0.02 25);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.64 0.19 27);
+  --ring: oklch(0.66 0.22 27.3);
   --sidebar: oklch(0.21 0.018 40);
   --sidebar-foreground: oklch(0.96 0.008 75);
-  --sidebar-primary: oklch(0.64 0.19 27);
+  --sidebar-primary: oklch(0.66 0.22 27.3);
   --sidebar-primary-foreground: oklch(0.15 0.02 27);
   --sidebar-accent: oklch(0.27 0.016 45);
   --sidebar-accent-foreground: oklch(0.96 0.008 75);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.64 0.19 27);
+  --sidebar-ring: oklch(0.66 0.22 27.3);
 
   --shadow-card: 0 1px 2px oklch(0 0 0 / 0.3), 0 8px 24px -12px oklch(0 0 0 / 0.5);
   --shadow-float: 0 12px 32px -10px oklch(0 0 0 / 0.55);

@@ -21,7 +21,13 @@ export const countries: Country[] = [
   "Guiné Equatorial",
 ];
 
-export type KycStatus = "não verificado" | "pendente" | "verificado";
+export type KycStatus = "não verificado" | "pendente" | "verificado" | "rejeitado";
+
+export type KycDocuments = {
+  front: string;
+  back: string;
+  selfie: string;
+};
 
 export type PoppyUser = {
   id: string;
@@ -32,6 +38,9 @@ export type PoppyUser = {
   country: Country;
   password: string;
   kycStatus: KycStatus;
+  kycDocuments?: KycDocuments;
+  kycSubmittedAt?: string;
+  kycNote?: string;
 };
 
 const USERS_KEY = "poppy_users";
@@ -96,9 +105,14 @@ export function setSecondaryEmail(id: string, secondaryEmail: string): PoppyUser
   return updateUser(id, { secondaryEmail });
 }
 
-/** Envia o pedido de verificação KYC (mock — passa a "pendente") */
-export function submitKyc(id: string): PoppyUser | null {
-  return updateUser(id, { kycStatus: "pendente" });
+/** Envia os documentos de KYC (bilhete frente, verso e selfie) — mock, passa a "pendente" */
+export function submitKycDocuments(id: string, documents: KycDocuments): PoppyUser | null {
+  return updateUser(id, {
+    kycStatus: "pendente",
+    kycDocuments: documents,
+    kycSubmittedAt: new Date().toISOString(),
+    kycNote: undefined,
+  });
 }
 
 /** Autentica por ID ou por email (Gmail) + senha */

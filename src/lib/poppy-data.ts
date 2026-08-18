@@ -22,17 +22,17 @@ export type Job = {
 };
 
 export const categories = [
-  { id: "design", name: "Design", icon: "PenTool", jobs: 128 },
-  { id: "programacao", name: "Programação", icon: "Code2", jobs: 214 },
-  { id: "marketing", name: "Marketing", icon: "Megaphone", jobs: 96 },
-  { id: "traducao", name: "Tradução", icon: "Languages", jobs: 41 },
-  { id: "escrita", name: "Escrita", icon: "FileText", jobs: 57 },
-  { id: "fotografia", name: "Fotografia", icon: "Camera", jobs: 33 },
-  { id: "video", name: "Vídeo", icon: "Video", jobs: 48 },
-  { id: "atendimento", name: "Atendimento", icon: "Headphones", jobs: 62 },
-  { id: "administracao", name: "Administração", icon: "ClipboardList", jobs: 29 },
-  { id: "rapidos", name: "Trabalhos rápidos", icon: "Zap", jobs: 187 },
-  { id: "outros", name: "Outros", icon: "MoreHorizontal", jobs: 24 },
+  { id: "design", name: "Design", icon: "PenTool" },
+  { id: "programacao", name: "Programação", icon: "Code2" },
+  { id: "marketing", name: "Marketing", icon: "Megaphone" },
+  { id: "traducao", name: "Tradução", icon: "Languages" },
+  { id: "escrita", name: "Escrita", icon: "FileText" },
+  { id: "fotografia", name: "Fotografia", icon: "Camera" },
+  { id: "video", name: "Vídeo", icon: "Video" },
+  { id: "atendimento", name: "Atendimento", icon: "Headphones" },
+  { id: "administracao", name: "Administração", icon: "ClipboardList" },
+  { id: "rapidos", name: "Micro tarefas", icon: "Zap" },
+  { id: "outros", name: "Outros", icon: "MoreHorizontal" },
 ];
 
 export const jobs: Job[] = [
@@ -198,127 +198,34 @@ export type QuickJob = {
 
 export const quickJobs: QuickJob[] = [
   { id: "q1", title: "Pesquisa de opinião sobre transporte", reward: 1500, minutes: 8, requirements: "Ter mais de 18 anos", tag: "Pesquisa" },
-  { id: "q2", title: "Teste de usabilidade de website", reward: 4500, minutes: 20, requirements: "Computador + microfone", tag: "Teste" },
+  { id: "q2", title: "Teste de usabilidade de um site", reward: 4500, minutes: 20, requirements: "Computador + microfone", tag: "Teste" },
   { id: "q3", title: "Recolha de 20 contactos de restaurantes", reward: 6000, minutes: 45, requirements: "Excel básico", tag: "Dados" },
-  { id: "q4", title: "Criar 3 banners simples para promoção", reward: 8000, minutes: 60, requirements: "Canva ou Figma", tag: "Design" },
+  { id: "q4", title: "Criar 3 artes simples para redes sociais", reward: 8000, minutes: 60, requirements: "Canva ou Figma", tag: "Design" },
   { id: "q5", title: "Revisar texto de 800 palavras", reward: 3000, minutes: 25, requirements: "Português fluente", tag: "Escrita" },
   { id: "q6", title: "Verificar preços em 10 lojas online", reward: 3500, minutes: 30, requirements: "Atenção ao detalhe", tag: "Dados" },
-];
-
-export type ProjectStatus = "Em análise" | "Aceito" | "Em andamento" | "Entregue" | "Aprovado" | "Concluído";
-
-export const projectStages: ProjectStatus[] = ["Em análise", "Aceito", "Em andamento", "Entregue", "Aprovado", "Concluído"];
-
-export type Project = {
-  id: string;
-  title: string;
-  client: string;
-  value: number;
-  status: ProjectStatus;
-  due: string;
-};
-
-export const projects: Project[] = [
-  { id: "p1", title: "Redesign de app de mobilidade", client: "Kubico Studio", value: 480000, status: "Em andamento", due: "12 Set" },
-  { id: "p2", title: "Landing page institucional", client: "Grupo Kianda", value: 340000, status: "Entregue", due: "02 Set" },
-  { id: "p3", title: "Identidade visual de padaria", client: "Pão da Ilha", value: 150000, status: "Aprovado", due: "28 Ago" },
-  { id: "p4", title: "Tradução de manual técnico", client: "Lumina Legal", value: 220000, status: "Em análise", due: "20 Set" },
-  { id: "p5", title: "Pacote de social media", client: "Café Baía", value: 120000, status: "Concluído", due: "10 Ago" },
-];
-
-export type Conversation = {
-  id: string;
-  name: string;
-  project: string;
-  last: string;
-  time: string;
-  unread: number;
-  online: boolean;
-  messages: { id: string; from: "me" | "them"; text?: string; file?: string; image?: boolean; time: string }[];
-};
-
-export const conversations: Conversation[] = [
-  {
-    id: "c1",
-    name: "Kubico Studio",
-    project: "Redesign de app de mobilidade · 480.000 Kz",
-    last: "Podemos revisar o fluxo de onboarding amanhã?",
-    time: "09:41",
-    unread: 2,
-    online: true,
-    messages: [
-      { id: "m1", from: "them", text: "Olá João! Vimos a sua proposta e gostámos muito do portfólio.", time: "09:20" },
-      { id: "m2", from: "me", text: "Obrigado! Posso começar já na segunda-feira.", time: "09:25" },
-      { id: "m3", from: "them", file: "briefing-onboarding.pdf", time: "09:30" },
-      { id: "m4", from: "them", text: "Podemos revisar o fluxo de onboarding amanhã?", time: "09:41" },
-    ],
-  },
-  {
-    id: "c2",
-    name: "Nzila Fintech",
-    project: "API de pagamentos · 950.000 Kz",
-    last: "Enviei o acesso ao repositório.",
-    time: "Ontem",
-    unread: 0,
-    online: false,
-    messages: [
-      { id: "m1", from: "them", text: "Enviei o acesso ao repositório.", time: "18:02" },
-      { id: "m2", from: "me", text: "Recebido, começo a análise hoje.", time: "18:20" },
-    ],
-  },
-  {
-    id: "c3",
-    name: "Café Baía",
-    project: "Social media · 120.000 Kz",
-    last: "As fotos ficaram excelentes 🙌",
-    time: "Seg",
-    unread: 0,
-    online: true,
-    messages: [
-      { id: "m1", from: "me", image: true, time: "14:00" },
-      { id: "m2", from: "them", text: "As fotos ficaram excelentes 🙌", time: "14:12" },
-    ],
-  },
-];
-
-export const transactions = [
-  { id: "t1", label: "Pagamento — Landing page institucional", date: "02 Set", amount: 340000, status: "Concluído" },
-  { id: "t2", label: "Levantamento para Banco BAI", date: "28 Ago", amount: -250000, status: "Concluído" },
-  { id: "t3", label: "Pagamento — Identidade visual", date: "26 Ago", amount: 150000, status: "Concluído" },
-  { id: "t4", label: "Quick Jobs — 6 tarefas", date: "24 Ago", amount: 21500, status: "Concluído" },
-  { id: "t5", label: "Pagamento — Redesign de app (1ª fase)", date: "20 Set", amount: 240000, status: "Pendente" },
-];
-
-export const courses = [
-  { id: "a1", title: "Fundamentos de UI Design", lessons: 12, progress: 75, level: "Iniciante", duration: "3h 20m" },
-  { id: "a2", title: "Propostas que ganham projetos", lessons: 8, progress: 40, level: "Intermediário", duration: "1h 45m" },
-  { id: "a3", title: "React do zero ao profissional", lessons: 26, progress: 12, level: "Intermediário", duration: "9h 10m" },
-  { id: "a4", title: "Gestão financeira para freelancers", lessons: 10, progress: 0, level: "Iniciante", duration: "2h 05m" },
+  { id: "q7", title: "Transcrever áudio de 10 minutos", reward: 2500, minutes: 20, requirements: "Boa audição", tag: "Escrita" },
+  { id: "q8", title: "Preencher formulário de cadastro em lote", reward: 2000, minutes: 15, requirements: "Atenção ao detalhe", tag: "Dados" },
 ];
 
 export const levels = ["Novato", "Bronze", "Prata", "Ouro", "Profissional"] as const;
 
+// Perfil de um utilizador novo, sem histórico. Os valores reais (saldo,
+// avaliações, tarefas concluídas) devem vir da conta ligada ao Supabase
+// quando essa integração existir — por agora, estado inicial honesto.
 export const me = {
-  name: "João Almeida",
-  role: "Product Designer & Front-end",
-  level: "Ouro" as const,
-  levelProgress: 68,
-  rating: 4.9,
-  reviews: 47,
-  completion: 98,
-  completed: 63,
-  balance: 412500,
-  pending: 240000,
-  earnings: 3184000,
-  bio:
-    "Designer de produto e desenvolvedor front-end com 6 anos de experiência. Ajudo empresas a lançar apps e sites claros, rápidos e fáceis de usar.",
-  skills: ["UI Design", "Figma", "React", "Tailwind", "Design System", "Prototipagem"],
-  experience: [
-    { role: "Product Designer", company: "Kubico Studio", period: "2023 — atual" },
-    { role: "Front-end Developer", company: "Nzila Fintech", period: "2021 — 2023" },
-    { role: "Designer Freelancer", company: "Independente", period: "2019 — 2021" },
-  ],
-  certificates: ["Poppy Academy — UI Design", "Google UX Design", "Scrum Foundations"],
+  name: "Utilizador Poppy",
+  role: "Membro Poppy",
+  level: "Novato" as const,
+  levelProgress: 0,
+  rating: 0,
+  reviews: 0,
+  completion: 0,
+  completed: 0,
+  balance: 0,
+  pending: 0,
+  earnings: 0,
+  bio: "",
+  skills: [] as string[],
 };
 
 export const formatKz = (value: number) =>

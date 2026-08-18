@@ -171,9 +171,9 @@ function JobsPage() {
         {results.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border p-8 text-center">
             <p className="text-sm font-semibold">Nenhum trabalho corresponde aos filtros</p>
-            <p className="mt-1 text-xs text-muted-foreground">Ajuste os filtros ou explore os trabalhos rápidos.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Ajuste os filtros ou explore as micro tarefas na página inicial.</p>
             <Button asChild variant="outline" size="sm" className="mt-4 rounded-xl">
-              <Link to="/quick-jobs">Ver Quick Jobs</Link>
+              <Link to="/">Ver micro tarefas</Link>
             </Button>
           </div>
         )}

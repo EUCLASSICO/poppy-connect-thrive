@@ -1,13 +1,55 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Award, Bell, Briefcase, Edit3, LogOut, Mail, MapPin, Star, Wallet } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  AlertOctagon,
+  Award,
+  Bell,
+  Briefcase,
+  ChevronRight,
+  Edit3,
+  LogOut,
+  Mail,
+  MapPin,
+  Settings,
+  ShieldCheck,
+  Star,
+  Trash2,
+  Wallet,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Screen, SectionTitle } from "@/components/poppy/Screen";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getCurrentUser, logout } from "@/lib/auth";
+import { deleteAccount, getCurrentUser, logout, type KycStatus } from "@/lib/auth";
 import { formatKz, levels, me } from "@/lib/poppy-data";
+
+const kycLabel: Record<KycStatus, string> = {
+  "não verificado": "Verificar identidade",
+  pendente: "KYC em análise",
+  verificado: "Identidade verificada",
+  rejeitado: "Verificação rejeitada",
+};
+
+const kycVariant: Record<KycStatus, "secondary" | "outline" | "default" | "destructive"> = {
+  "não verificado": "secondary",
+  pendente: "outline",
+  verificado: "default",
+  rejeitado: "destructive",
+};
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -29,9 +71,24 @@ function initials(name: string) {
 }
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const account = getCurrentUser();
   const name = account?.fullName ?? me.name;
   const levelIndex = Math.max(levels.indexOf(me.level), 0);
+  const [deleting, setDeleting] = useState(false);
+
+  function handleDeleteAccount() {
+    if (!account) return;
+    setDeleting(true);
+    const ok = deleteAccount(account.id);
+    setDeleting(false);
+    if (ok) {
+      toast.success("Conta eliminada.", { description: "É uma pena ver-te partir." });
+      navigate({ to: "/signup" });
+    } else {
+      toast.error("Não foi possível eliminar a conta.");
+    }
+  }
 
   return (
     <Screen>
@@ -57,6 +114,12 @@ function ProfilePage() {
           <p className="mt-4 text-lg font-bold">{name}</p>
           {account && <Badge className="mt-2 border-transparent bg-primary-foreground/15 text-primary-foreground">{account.id}</Badge>}
           <p className="mt-2 text-sm text-primary-foreground/85">{me.role}</p>
+          <Link
+            to="/settings"
+            className="mt-3 flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-4 py-1.5 text-xs font-semibold transition-colors hover:bg-primary-foreground/25"
+          >
+            <Settings className="size-3.5" /> Definições
+          </Link>
         </div>
 
         <div className="mt-5 flex items-center justify-between text-xs">
@@ -82,6 +145,24 @@ function ProfilePage() {
             <span className="truncate">{account.username}</span>
           </div>
         </section>
+      )}
+
+      {/* Verificação de identidade */}
+      {account && (
+        <Link
+          to="/kyc"
+          className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary"
+        >
+          <span className="bg-primary-soft flex size-10 shrink-0 items-center justify-center rounded-xl text-primary">
+            <ShieldCheck className="size-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">{kycLabel[account.kycStatus]}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">BI, selfie, morada, telefone e assinatura</p>
+          </div>
+          <Badge variant={kycVariant[account.kycStatus]}>{account.kycStatus}</Badge>
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+        </Link>
       )}
 
       {/* Estatísticas */}
@@ -175,11 +256,45 @@ function ProfilePage() {
           size="lg"
           onClick={() => {
             logout();
-            window.location.href = "/welcome";
+            navigate({ to: "/login" });
           }}
         >
           <LogOut className="size-4" /> Sair da conta
         </Button>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 rounded-xl border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive"
+              size="lg"
+              disabled={!account}
+            >
+              <Trash2 className="size-4" /> Eliminar conta
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <AlertOctagon className="size-5 text-destructive" /> Eliminar conta definitivamente?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Todos os seus dados, incluindo verificação KYC, saldo e
+                histórico de trabalhos, serão permanentemente apagados.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                disabled={deleting}
+                onClick={handleDeleteAccount}
+              >
+                {deleting ? "A eliminar..." : "Sim, eliminar conta"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Screen>
   );

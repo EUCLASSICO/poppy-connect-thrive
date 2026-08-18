@@ -14,7 +14,7 @@ import { categories, formatKz, jobs } from "@/lib/poppy-data";
 
 type Search = { category?: string };
 
-export const Route = createFileRoute("/jobs")({
+export const Route = createFileRoute("/jobs/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
     category: typeof search.category === "string" ? search.category : undefined,
   }),

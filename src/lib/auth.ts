@@ -27,6 +27,9 @@ export type KycDocuments = {
   front: string;
   back: string;
   selfie: string;
+  signature: string;
+  address: string;
+  phone: string;
 };
 
 export type PoppyUser = {
@@ -37,6 +40,8 @@ export type PoppyUser = {
   secondaryEmail?: string;
   country: Country;
   password: string;
+  address?: string;
+  phone?: string;
   kycStatus: KycStatus;
   kycDocuments?: KycDocuments;
   kycSubmittedAt?: string;
@@ -105,14 +110,27 @@ export function setSecondaryEmail(id: string, secondaryEmail: string): PoppyUser
   return updateUser(id, { secondaryEmail });
 }
 
-/** Envia os documentos de KYC (bilhete frente, verso e selfie) — mock, passa a "pendente" */
+/** Envia os documentos de KYC (BI frente/verso, selfie com BI, assinatura, morada e telefone) — mock, passa a "pendente" */
 export function submitKycDocuments(id: string, documents: KycDocuments): PoppyUser | null {
   return updateUser(id, {
     kycStatus: "pendente",
     kycDocuments: documents,
     kycSubmittedAt: new Date().toISOString(),
     kycNote: undefined,
+    address: documents.address,
+    phone: documents.phone,
   });
+}
+
+/** Apaga definitivamente a conta e a sessão associada */
+export function deleteAccount(id: string): boolean {
+  const users = readUsers();
+  const next = users.filter((u) => u.id !== id);
+  if (next.length === users.length) return false;
+  writeUsers(next);
+  const sessionId = window.localStorage.getItem(SESSION_KEY);
+  if (sessionId === id) window.localStorage.removeItem(SESSION_KEY);
+  return true;
 }
 
 /** Autentica por ID ou por email (Gmail) + senha */

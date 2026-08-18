@@ -1,14 +1,25 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, KeyRound, LogOut, Mail, ShieldCheck } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { AlertOctagon, ChevronRight, Eye, EyeOff, KeyRound, LogOut, Mail, ShieldCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Screen, ScreenHeader, SectionTitle } from "@/components/poppy/Screen";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { changePassword, getCurrentUser, logout, setSecondaryEmail, submitKyc, type KycStatus } from "@/lib/auth";
+import { changePassword, deleteAccount, getCurrentUser, logout, setSecondaryEmail, type KycStatus } from "@/lib/auth";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -24,12 +35,14 @@ const kycLabel: Record<KycStatus, string> = {
   "não verificado": "Não verificado",
   pendente: "Em análise",
   verificado: "Verificado",
+  rejeitado: "Rejeitado",
 };
 
-const kycVariant: Record<KycStatus, "secondary" | "outline" | "default"> = {
+const kycVariant: Record<KycStatus, "secondary" | "outline" | "default" | "destructive"> = {
   "não verificado": "secondary",
   pendente: "outline",
   verificado: "default",
+  rejeitado: "destructive",
 };
 
 function SettingsPage() {
@@ -42,6 +55,7 @@ function SettingsPage() {
   const [showPasswords, setShowPasswords] = useState(false);
 
   const [secondaryEmail, setSecondaryEmailInput] = useState(account?.secondaryEmail ?? "");
+  const [deleting, setDeleting] = useState(false);
 
   if (!account) {
     return (
@@ -52,15 +66,6 @@ function SettingsPage() {
         </p>
       </Screen>
     );
-  }
-
-  function handleKyc() {
-    if (!account) return;
-    const updated = submitKyc(account.id);
-    if (updated) {
-      setAccount(updated);
-      toast.success("Pedido de verificação enviado.", { description: "A sua análise está em curso." });
-    }
   }
 
   function handleChangePassword(e: React.FormEvent) {
@@ -115,7 +120,20 @@ function SettingsPage() {
 
   function handleLogout() {
     logout();
-    navigate({ to: "/welcome" });
+    navigate({ to: "/login" });
+  }
+
+  function handleDeleteAccount() {
+    if (!account) return;
+    setDeleting(true);
+    const ok = deleteAccount(account.id);
+    setDeleting(false);
+    if (ok) {
+      toast.success("Conta eliminada.", { description: "É uma pena ver-te partir." });
+      navigate({ to: "/signup" });
+    } else {
+      toast.error("Não foi possível eliminar a conta.");
+    }
   }
 
   return (
@@ -124,31 +142,24 @@ function SettingsPage() {
 
       {/* Verificação KYC */}
       <SectionTitle>Verificação de identidade</SectionTitle>
-      <div className="rounded-2xl border border-border bg-card p-4">
-        <div className="flex items-start gap-3">
-          <span className="bg-primary-soft flex size-10 shrink-0 items-center justify-center rounded-xl text-primary">
-            <ShieldCheck className="size-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold">Verificação KYC</p>
-              <Badge variant={kycVariant[account.kycStatus]}>{kycLabel[account.kycStatus]}</Badge>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Verifique a sua identidade para aumentar limites de saque e reforçar a confiança de clientes.
-            </p>
+      <Link
+        to="/kyc"
+        className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary"
+      >
+        <span className="bg-primary-soft flex size-10 shrink-0 items-center justify-center rounded-xl text-primary">
+          <ShieldCheck className="size-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold">Verificação KYC</p>
+            <Badge variant={kycVariant[account.kycStatus]}>{kycLabel[account.kycStatus]}</Badge>
           </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            BI (frente e verso), selfie com o BI, morada, telefone e assinatura digital.
+          </p>
         </div>
-        {account.kycStatus !== "verificado" && (
-          <Button
-            className="mt-4 w-full rounded-xl"
-            disabled={account.kycStatus === "pendente"}
-            onClick={handleKyc}
-          >
-            {account.kycStatus === "pendente" ? "Análise em curso" : "Iniciar verificação"}
-          </Button>
-        )}
-      </div>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+      </Link>
 
       {/* Trocar senha */}
       <SectionTitle>Trocar senha</SectionTitle>
@@ -255,14 +266,49 @@ function SettingsPage() {
         </div>
       </div>
 
-      <Button
-        variant="outline"
-        className="mt-6 w-full justify-start gap-2 rounded-xl text-destructive hover:text-destructive"
-        size="lg"
-        onClick={handleLogout}
-      >
-        <LogOut className="size-4" /> Sair da conta
-      </Button>
+      <div className="mt-6 space-y-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-2 rounded-xl text-destructive hover:text-destructive"
+          size="lg"
+          onClick={handleLogout}
+        >
+          <LogOut className="size-4" /> Sair da conta
+        </Button>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 rounded-xl border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive"
+              size="lg"
+            >
+              <Trash2 className="size-4" /> Eliminar conta
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <AlertOctagon className="size-5 text-destructive" /> Eliminar conta definitivamente?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Todos os seus dados, incluindo verificação KYC, saldo e
+                histórico de trabalhos, serão permanentemente apagados.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                disabled={deleting}
+                onClick={handleDeleteAccount}
+              >
+                {deleting ? "A eliminar..." : "Sim, eliminar conta"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </Screen>
   );
 }

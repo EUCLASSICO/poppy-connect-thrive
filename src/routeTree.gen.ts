@@ -10,33 +10,153 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KycRouteImport } from './routes/kyc'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PostRouteImport } from './routes/post'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as JobsIndexRouteImport } from './routes/jobs.index'
+import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as JobsJobIdProposalRouteImport } from './routes/jobs.$jobId.proposal'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KycRoute = KycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostRoute = PostRouteImport.update({
+  id: '/post',
+  path: '/post',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIndexRoute = JobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsJobIdRoute = JobsJobIdRouteImport.update({
+  id: '/jobs/$jobId',
+  path: '/jobs/$jobId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsJobIdProposalRoute = JobsJobIdProposalRouteImport.update({
+  id: '/proposal',
+  path: '/proposal',
+  getParentRoute: () => JobsJobIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/kyc': typeof KycRoute
+  '/login': typeof LoginRoute
+  '/post': typeof PostRoute
+  '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
+  '/jobs/': typeof JobsIndexRoute
+  '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/kyc': typeof KycRoute
+  '/login': typeof LoginRoute
+  '/post': typeof PostRoute
+  '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
+  '/jobs': typeof JobsIndexRoute
+  '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/kyc': typeof KycRoute
+  '/login': typeof LoginRoute
+  '/post': typeof PostRoute
+  '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
+  '/jobs/': typeof JobsIndexRoute
+  '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/kyc'
+    | '/login'
+    | '/post'
+    | '/profile'
+    | '/settings'
+    | '/signup'
+    | '/jobs/$jobId'
+    | '/jobs/'
+    | '/jobs/$jobId/proposal'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/kyc'
+    | '/login'
+    | '/post'
+    | '/profile'
+    | '/settings'
+    | '/signup'
+    | '/jobs/$jobId'
+    | '/jobs'
+    | '/jobs/$jobId/proposal'
+  id:
+    | '__root__'
+    | '/'
+    | '/kyc'
+    | '/login'
+    | '/post'
+    | '/profile'
+    | '/settings'
+    | '/signup'
+    | '/jobs/$jobId'
+    | '/jobs/'
+    | '/jobs/$jobId/proposal'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  KycRoute: typeof KycRoute
+  LoginRoute: typeof LoginRoute
+  PostRoute: typeof PostRoute
+  ProfileRoute: typeof ProfileRoute
+  SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
+  JobsJobIdRoute: typeof JobsJobIdRouteWithChildren
+  JobsIndexRoute: typeof JobsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +168,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kyc': {
+      id: '/kyc'
+      path: '/kyc'
+      fullPath: '/kyc'
+      preLoaderRoute: typeof KycRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/post': {
+      id: '/post'
+      path: '/post'
+      fullPath: '/post'
+      preLoaderRoute: typeof PostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/': {
+      id: '/jobs/'
+      path: '/jobs'
+      fullPath: '/jobs/'
+      preLoaderRoute: typeof JobsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$jobId': {
+      id: '/jobs/$jobId'
+      path: '/jobs/$jobId'
+      fullPath: '/jobs/$jobId'
+      preLoaderRoute: typeof JobsJobIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$jobId/proposal': {
+      id: '/jobs/$jobId/proposal'
+      path: '/proposal'
+      fullPath: '/jobs/$jobId/proposal'
+      preLoaderRoute: typeof JobsJobIdProposalRouteImport
+      parentRoute: typeof JobsJobIdRoute
+    }
   }
 }
 
+interface JobsJobIdRouteChildren {
+  JobsJobIdProposalRoute: typeof JobsJobIdProposalRoute
+}
+
+const JobsJobIdRouteChildren: JobsJobIdRouteChildren = {
+  JobsJobIdProposalRoute: JobsJobIdProposalRoute,
+}
+
+const JobsJobIdRouteWithChildren = JobsJobIdRoute._addFileChildren(
+  JobsJobIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  KycRoute: KycRoute,
+  LoginRoute: LoginRoute,
+  PostRoute: PostRoute,
+  ProfileRoute: ProfileRoute,
+  SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
+  JobsJobIdRoute: JobsJobIdRouteWithChildren,
+  JobsIndexRoute: JobsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

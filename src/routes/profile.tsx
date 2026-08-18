@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Award, Bell, Briefcase, LogOut, Mail, MapPin, Pencil, Settings, Star, Wallet } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Award, Bell, Briefcase, Edit3, LogOut, Mail, MapPin, Star, Wallet } from "lucide-react";
 
 import { Screen, SectionTitle } from "@/components/poppy/Screen";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -29,16 +29,9 @@ function initials(name: string) {
 }
 
 function ProfilePage() {
-  const navigate = useNavigate();
   const account = getCurrentUser();
-
   const name = account?.fullName ?? me.name;
   const levelIndex = Math.max(levels.indexOf(me.level), 0);
-
-  function handleLogout() {
-    logout();
-    navigate({ to: "/welcome" });
-  }
 
   return (
     <Screen>
@@ -47,38 +40,23 @@ function ProfilePage() {
         <Link
           to="/settings"
           className="flex size-9 items-center justify-center rounded-full bg-secondary"
-          aria-label="Notificações"
+          aria-label="Configurações"
         >
           <Bell className="size-5" />
         </Link>
       </header>
 
       {/* Cabeçalho do perfil */}
-      <section className="bg-gradient-primary shadow-float mt-1 rounded-3xl p-6 text-primary-foreground">
+      <section className="bg-gradient-primary shadow-float mt-1 rounded-3xl p-5 text-primary-foreground">
         <div className="flex flex-col items-center text-center">
-          <Avatar className="size-20 border-2 border-primary-foreground/30">
+          <Avatar className="size-20 border-4 border-primary-foreground/30">
             <AvatarFallback className="bg-primary-foreground/15 text-2xl font-bold text-primary-foreground">
               {initials(name)}
             </AvatarFallback>
           </Avatar>
-          <p className="mt-3 truncate text-lg font-bold">{name}</p>
-          <p className="truncate text-xs text-primary-foreground/80">{me.role}</p>
-          {account && (
-            <Badge className="mt-2 border-transparent bg-primary-foreground/15 text-primary-foreground">
-              {account.id}
-            </Badge>
-          )}
-
-          <Button
-            asChild
-            size="sm"
-            variant="outline"
-            className="mt-4 gap-1.5 rounded-full border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
-          >
-            <Link to="/settings">
-              <Settings className="size-3.5" /> Configurações
-            </Link>
-          </Button>
+          <p className="mt-4 text-lg font-bold">{name}</p>
+          {account && <Badge className="mt-2 border-transparent bg-primary-foreground/15 text-primary-foreground">{account.id}</Badge>}
+          <p className="mt-2 text-sm text-primary-foreground/85">{me.role}</p>
         </div>
 
         <div className="mt-5 flex items-center justify-between text-xs">
@@ -128,7 +106,7 @@ function ProfilePage() {
       {/* Carteira */}
       <Link
         to="/wallet"
-        className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-card p-4"
+        className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary"
       >
         <div className="flex items-center gap-3">
           <span className="bg-primary-soft flex size-10 items-center justify-center rounded-xl text-primary">
@@ -186,14 +164,19 @@ function ProfilePage() {
 
       {/* Ações */}
       <div className="mt-6 space-y-2">
-        <Button variant="outline" className="w-full justify-start gap-2 rounded-xl" size="lg">
-          <Pencil className="size-4" /> Editar perfil
+        <Button asChild variant="outline" className="w-full justify-start gap-2 rounded-xl" size="lg">
+          <Link to="/edit-profile">
+            <Edit3 className="size-4" /> Editar perfil
+          </Link>
         </Button>
         <Button
           variant="outline"
           className="w-full justify-start gap-2 rounded-xl text-destructive hover:text-destructive"
           size="lg"
-          onClick={handleLogout}
+          onClick={() => {
+            logout();
+            window.location.href = "/welcome";
+          }}
         >
           <LogOut className="size-4" /> Sair da conta
         </Button>

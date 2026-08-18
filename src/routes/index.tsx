@@ -13,14 +13,16 @@ import {
   PlusCircle,
   Search,
   ShieldCheck,
+  Sparkles,
   Video,
   Zap,
 } from "lucide-react";
 
 import { Screen, SectionTitle } from "@/components/poppy/Screen";
 import { PoppyLogo } from "@/components/poppy/PoppyLogo";
-import { PromoBanner } from "@/components/poppy/PromoBanner";
 import { JobCard } from "@/components/poppy/JobCard";
+import { AdSlot } from "@/components/poppy/AdSlot";
+import { getCurrentUser } from "@/lib/auth";
 import { categories, formatKz, jobs, me, quickJobs } from "@/lib/poppy-data";
 
 export const Route = createFileRoute("/")({
@@ -59,6 +61,8 @@ const shortcuts = [
 ] as const;
 
 function Home() {
+  const account = getCurrentUser();
+  const firstName = account?.fullName.split(" ")[0] ?? me.name;
   const recommended = jobs.filter((j) => j.featured);
 
   return (
@@ -67,7 +71,7 @@ function Home() {
         <PoppyLogo size={28} />
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground">Bem-vindo,</p>
-          <p className="truncate text-sm font-bold">{me.name}</p>
+          <p className="truncate text-sm font-bold">{firstName}</p>
         </div>
         <Link
           to="/settings"
@@ -84,8 +88,6 @@ function Home() {
       >
         <Search className="size-4" /> Procurar micro tarefas, trabalhos, habilidades
       </Link>
-
-      <PromoBanner />
 
       {/* Saldo — cartão simples, sem gradiente pesado */}
       <section className="mt-4 grid grid-cols-3 divide-x divide-border rounded-2xl border border-border bg-card p-4 text-center">
@@ -157,23 +159,30 @@ function Home() {
       >
         Micro tarefas
       </SectionTitle>
-      <div className="grid grid-cols-2 gap-2.5">
-        {quickJobs.map((q) => (
-          <Link
-            key={q.id}
-            to="/jobs"
-            search={{ category: "rapidos" }}
-            className="rounded-2xl border border-border bg-card p-3.5"
-          >
-            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-bold text-accent">{q.tag}</span>
-            <p className="mt-2 text-[13px] font-semibold leading-snug">{q.title}</p>
-            <div className="mt-2 flex items-center justify-between">
-              <p className="text-sm font-bold text-primary">{formatKz(q.reward)}</p>
-              <p className="text-[11px] text-muted-foreground">≈{q.minutes} min</p>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {quickJobs.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2.5">
+          {quickJobs.map((q) => (
+            <Link
+              key={q.id}
+              to="/jobs"
+              search={{ category: "rapidos" }}
+              className="rounded-2xl border border-border bg-card p-3.5"
+            >
+              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-bold text-accent">{q.tag}</span>
+              <p className="mt-2 text-[13px] font-semibold leading-snug">{q.title}</p>
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-sm font-bold text-primary">{formatKz(q.reward)}</p>
+                <p className="text-[11px] text-muted-foreground">≈{q.minutes} min</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <EmptySection
+          icon={Zap}
+          text="Ainda não há micro tarefas publicadas. As primeiras aparecem aqui assim que uma empresa publicar."
+        />
+      )}
 
       <SectionTitle
         action={
@@ -184,11 +193,20 @@ function Home() {
       >
         Trabalhos recomendados
       </SectionTitle>
-      <div className="space-y-3">
-        {recommended.map((job) => (
-          <JobCard key={job.id} job={job} />
-        ))}
-      </div>
+      {recommended.length > 0 ? (
+        <div className="space-y-3">
+          {recommended.map((job) => (
+            <JobCard key={job.id} job={job} />
+          ))}
+        </div>
+      ) : (
+        <EmptySection
+          icon={Sparkles}
+          text="Sem trabalhos recomendados por agora. Complete o seu perfil para começar a receber sugestões."
+        />
+      )}
+
+      <AdSlot className="mt-6" />
 
       <SectionTitle>Como funciona</SectionTitle>
       <div className="space-y-2">
@@ -215,5 +233,16 @@ function Home() {
         </div>
       </div>
     </Screen>
+  );
+}
+
+function EmptySection({ icon: Icon, text }: { icon: typeof Zap; text: string }) {
+  return (
+    <div className="flex items-start gap-3 rounded-2xl border border-dashed border-border bg-card/60 p-4">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
+        <Icon className="size-4" />
+      </span>
+      <p className="text-xs text-muted-foreground">{text}</p>
+    </div>
   );
 }

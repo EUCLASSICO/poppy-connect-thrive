@@ -8,14 +8,18 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNav } from "@/components/poppy/BottomNav";
 import { Toaster } from "@/components/ui/sonner";
+import { PoppyLogo } from "@/components/poppy/PoppyLogo";
+import { getCurrentUser } from "@/lib/auth";
 
 const HIDE_NAV = ["/welcome", "/login", "/signup"];
+// Quem não tem sessão só pode ver o login e o cadastro — tudo o resto exige conta.
+const PUBLIC_ROUTES = ["/login", "/signup"];
 
 function NotFoundComponent() {
   return (
@@ -97,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600&display=swap",
       },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
     ],
@@ -124,15 +128,51 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const showNav = !HIDE_NAV.some((p) => pathname.startsWith(p));
+  const isPublicRoute = PUBLIC_ROUTES.some((p) => pathname.startsWith(p));
+
+  // A sessão vive no localStorage (só existe no browser), por isso a
+  // verificação corre depois de montar — no servidor e no primeiro
+  // render do cliente mostramos sempre o mesmo estado "a verificar",
+  // para não haver flash de conteúdo nem erro de hidratação.
+  const [authState, setAuthState] = useState<"checking" | "authorized">(
+    isPublicRoute ? "authorized" : "checking",
+  );
+
+  useEffect(() => {
+    if (isPublicRoute) {
+      setAuthState("authorized");
+      return;
+    }
+    if (getCurrentUser()) {
+      setAuthState("authorized");
+    } else {
+      router.navigate({ to: "/login", replace: true });
+    }
+  }, [pathname, isPublicRoute]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      {showNav && <BottomNav />}
+      {authState === "authorized" ? (
+        <>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          {showNav && <BottomNav />}
+        </>
+      ) : (
+        <AuthCheckingScreen />
+      )}
       <Toaster />
     </QueryClientProvider>
+  );
+}
+
+function AuthCheckingScreen() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <PoppyLogo size={40} className="animate-pulse" />
+    </div>
   );
 }

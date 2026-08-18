@@ -168,12 +168,28 @@ function JobsPage() {
         {results.map((job) => (
           <JobCard key={job.id} job={job} />
         ))}
-        {results.length === 0 && (
+        {results.length === 0 && jobs.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+            <p className="text-sm font-semibold">Ainda não há trabalhos publicados</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Assim que uma empresa publicar uma vaga, ela aparece aqui. Também pode publicar um trabalho.
+            </p>
+            <Button asChild size="sm" className="mt-4 rounded-xl">
+              <Link to="/post">Publicar um trabalho</Link>
+            </Button>
+          </div>
+        )}
+        {results.length === 0 && jobs.length > 0 && (
           <div className="rounded-2xl border border-dashed border-border p-8 text-center">
             <p className="text-sm font-semibold">Nenhum trabalho corresponde aos filtros</p>
-            <p className="mt-1 text-xs text-muted-foreground">Ajuste os filtros ou explore as micro tarefas na página inicial.</p>
-            <Button asChild variant="outline" size="sm" className="mt-4 rounded-xl">
-              <Link to="/">Ver micro tarefas</Link>
+            <p className="mt-1 text-xs text-muted-foreground">Ajuste os filtros para ver mais resultados.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4 rounded-xl"
+              onClick={() => navigate({ search: {} })}
+            >
+              Limpar filtros
             </Button>
           </div>
         )}

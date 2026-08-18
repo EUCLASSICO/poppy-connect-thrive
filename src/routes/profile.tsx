@@ -108,7 +108,17 @@ function ProfilePage() {
               {initials(name)}
             </AvatarFallback>
           </Avatar>
-          <p className="mt-4 text-lg font-bold">{name}</p>
+          <div className="mt-4 flex items-center gap-2">
+            <p className="text-lg font-bold">{name}</p>
+            {account?.kycStatus === "verificado" && (
+              <span
+                className="stamp-badge size-9 shrink-0 text-[9px] font-bold text-primary-foreground"
+                title="Identidade verificada"
+              >
+                OK
+              </span>
+            )}
+          </div>
           {account && <Badge className="mt-2 border-transparent bg-primary-foreground/15 text-primary-foreground">{account.id}</Badge>}
           <p className="mt-2 text-sm text-primary-foreground/85">{me.role}</p>
           <Link

@@ -12,10 +12,8 @@ import {
   PenTool,
   PlusCircle,
   Search,
-  Shield,
   ShieldCheck,
   Video,
-  Wallet,
   Zap,
 } from "lucide-react";
 
@@ -23,8 +21,6 @@ import { Screen, SectionTitle } from "@/components/poppy/Screen";
 import { PoppyLogo } from "@/components/poppy/PoppyLogo";
 import { PromoBanner } from "@/components/poppy/PromoBanner";
 import { JobCard } from "@/components/poppy/JobCard";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { categories, formatKz, jobs, me, quickJobs } from "@/lib/poppy-data";
 
 export const Route = createFileRoute("/")({
@@ -36,7 +32,7 @@ export const Route = createFileRoute("/")({
         content: "Poppy: encontre micro tarefas rápidas e trabalhos freelance, envie propostas e receba o pagamento na sua carteira.",
       },
       { property: "og:title", content: "Poppy — Micro tarefas e trabalho freelance" },
-      { property: "og:description", content: "Micro tarefas, trabalhos recomendados e categorias, tudo num só lugar." },
+      { property: "og:description", content: "Micro tarefas, categorias e trabalhos recomendados, tudo num só lugar." },
     ],
   }),
   component: Home,
@@ -60,7 +56,6 @@ const shortcuts = [
   { to: "/jobs", label: "Trabalhos", icon: Zap },
   { to: "/post", label: "Publicar", icon: PlusCircle },
   { to: "/kyc", label: "Verificação", icon: ShieldCheck },
-  { to: "/settings", label: "Definições", icon: Shield },
 ] as const;
 
 function Home() {
@@ -92,54 +87,65 @@ function Home() {
 
       <PromoBanner />
 
-      {/* Carteira */}
-      <section className="bg-gradient-primary shadow-float mt-4 rounded-3xl p-5 text-primary-foreground">
-        <p className="text-xs opacity-80">Saldo disponível</p>
-        <p className="font-display mt-1 text-3xl font-bold">{formatKz(me.balance)}</p>
-        <div className="mt-4 flex items-center justify-between gap-3 text-xs">
-          <div>
-            <p className="opacity-80">Pendente</p>
-            <p className="font-semibold">{formatKz(me.pending)}</p>
-          </div>
-          <div>
-            <p className="opacity-80">Ganhos totais</p>
-            <p className="font-semibold">{formatKz(me.earnings)}</p>
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-background/20 px-3 py-2 font-semibold backdrop-blur">
-            <Wallet className="size-4" /> Carteira
-          </span>
+      {/* Saldo — cartão simples, sem gradiente pesado */}
+      <section className="mt-4 grid grid-cols-3 divide-x divide-border rounded-2xl border border-border bg-card p-4 text-center">
+        <div>
+          <p className="font-display text-lg font-bold text-foreground">{formatKz(me.balance)}</p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">Saldo</p>
+        </div>
+        <div>
+          <p className="font-display text-lg font-bold text-foreground">{formatKz(me.pending)}</p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">Pendente</p>
+        </div>
+        <div>
+          <p className="font-display text-lg font-bold text-primary">{me.completed}</p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">Tarefas feitas</p>
         </div>
       </section>
 
-      {/* Nível */}
-      <section className="shadow-card mt-4 rounded-2xl border border-border/70 bg-card p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-bold">
-            Nível {me.level} <span className="text-muted-foreground">· {me.completed} tarefas concluídas</span>
-          </p>
-          {me.reviews > 0 && (
-            <Badge className="rounded-full bg-accent-soft text-accent-foreground" variant="secondary">
-              {me.rating} ★
-            </Badge>
-          )}
-        </div>
-        <Progress value={me.levelProgress} className="mt-3 h-2" />
-        <p className="mt-2 text-xs text-muted-foreground">Complete micro tarefas e trabalhos para subir de nível.</p>
-      </section>
-
-      <div className="mt-4 grid grid-cols-4 gap-2">
+      <div className="mt-3 grid grid-cols-3 gap-2">
         {shortcuts.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
             to={to}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-border/70 bg-card p-3 text-center"
+            className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-2.5 text-xs font-semibold"
           >
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary-soft text-primary">
-              <Icon className="size-4" />
-            </span>
-            <span className="text-[11px] font-semibold leading-tight">{label}</span>
+            <Icon className="size-4 text-primary" /> {label}
           </Link>
         ))}
+      </div>
+
+      {/* Categorias — como numa loja de micro tarefas: navegação por tipo de trabalho */}
+      <SectionTitle
+        action={
+          <Link to="/jobs" className="text-xs font-semibold text-primary">
+            Ver tudo
+          </Link>
+        }
+      >
+        Categorias
+      </SectionTitle>
+      <div className="no-scrollbar -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1">
+        {categories.map((c) => {
+          const Icon = icons[c.icon] ?? MoreHorizontal;
+          const count = jobs.filter((j) => j.category === c.id).length;
+          return (
+            <Link
+              key={c.id}
+              to="/jobs"
+              search={{ category: c.id }}
+              className="flex w-28 shrink-0 flex-col items-start gap-2 rounded-2xl border border-border bg-card p-3"
+            >
+              <span className="flex size-8 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                <Icon className="size-4" />
+              </span>
+              <span className="text-[11px] font-semibold leading-tight">{c.name}</span>
+              <span className="text-[10px] text-muted-foreground">
+                {count > 0 ? `${count} vagas` : "Em breve"}
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
       <SectionTitle
@@ -151,40 +157,22 @@ function Home() {
       >
         Micro tarefas
       </SectionTitle>
-      <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4">
+      <div className="grid grid-cols-2 gap-2.5">
         {quickJobs.map((q) => (
           <Link
             key={q.id}
             to="/jobs"
             search={{ category: "rapidos" }}
-            className="shadow-card w-48 shrink-0 rounded-2xl border border-border/70 bg-card p-4"
+            className="rounded-2xl border border-border bg-card p-3.5"
           >
             <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-bold text-accent">{q.tag}</span>
-            <p className="mt-2 text-sm font-semibold leading-snug">{q.title}</p>
-            <p className="mt-2 text-sm font-bold text-primary">{formatKz(q.reward)}</p>
-            <p className="text-xs text-muted-foreground">≈ {q.minutes} min</p>
+            <p className="mt-2 text-[13px] font-semibold leading-snug">{q.title}</p>
+            <div className="mt-2 flex items-center justify-between">
+              <p className="text-sm font-bold text-primary">{formatKz(q.reward)}</p>
+              <p className="text-[11px] text-muted-foreground">≈{q.minutes} min</p>
+            </div>
           </Link>
         ))}
-      </div>
-
-      <SectionTitle>Categorias</SectionTitle>
-      <div className="grid grid-cols-3 gap-2">
-        {categories.map((c) => {
-          const Icon = icons[c.icon] ?? MoreHorizontal;
-          return (
-            <Link
-              key={c.id}
-              to="/jobs"
-              search={{ category: c.id }}
-              className="flex flex-col items-start gap-2 rounded-2xl border border-border/70 bg-card p-3"
-            >
-              <span className="flex size-8 items-center justify-center rounded-lg bg-secondary text-primary">
-                <Icon className="size-4" />
-              </span>
-              <span className="text-[11px] font-semibold leading-tight">{c.name}</span>
-            </Link>
-          );
-        })}
       </div>
 
       <SectionTitle
@@ -204,7 +192,7 @@ function Home() {
 
       <SectionTitle>Como funciona</SectionTitle>
       <div className="space-y-2">
-        <div className="flex gap-3 rounded-2xl border border-border/70 bg-card p-4">
+        <div className="flex gap-3 rounded-2xl border border-border bg-card p-4">
           <ShieldCheck className="size-5 shrink-0 text-primary" />
           <div>
             <p className="text-sm font-semibold">Verifique a sua identidade</p>
@@ -216,7 +204,7 @@ function Home() {
             </Link>
           </div>
         </div>
-        <div className="flex gap-3 rounded-2xl border border-border/70 bg-card p-4">
+        <div className="flex gap-3 rounded-2xl border border-border bg-card p-4">
           <FileText className="size-5 shrink-0 text-accent" />
           <div>
             <p className="text-sm font-semibold">Envie propostas</p>

@@ -19,6 +19,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as JobsJobIdProposalRouteImport } from './routes/jobs.$jobId.proposal'
@@ -73,6 +74,11 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsIndexRoute = JobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/welcome': typeof WelcomeRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
   '/jobs/': typeof JobsIndexRoute
   '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/projects': typeof ProjectsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/welcome': typeof WelcomeRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
   '/jobs': typeof JobsIndexRoute
   '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/welcome': typeof WelcomeRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
   '/jobs/': typeof JobsIndexRoute
   '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/settings'
     | '/signup'
+    | '/welcome'
     | '/jobs/$jobId'
     | '/jobs/'
     | '/jobs/$jobId/proposal'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/settings'
     | '/signup'
+    | '/welcome'
     | '/jobs/$jobId'
     | '/jobs'
     | '/jobs/$jobId/proposal'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/settings'
     | '/signup'
+    | '/welcome'
     | '/jobs/$jobId'
     | '/jobs/'
     | '/jobs/$jobId/proposal'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   ProjectsRoute: typeof ProjectsRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
+  WelcomeRoute: typeof WelcomeRoute
   JobsJobIdRoute: typeof JobsJobIdRouteWithChildren
   JobsIndexRoute: typeof JobsIndexRoute
 }
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/': {
       id: '/jobs/'
       path: '/jobs'
@@ -317,6 +337,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjectsRoute: ProjectsRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
+  WelcomeRoute: WelcomeRoute,
   JobsJobIdRoute: JobsJobIdRouteWithChildren,
   JobsIndexRoute: JobsIndexRoute,
 }

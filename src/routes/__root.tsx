@@ -18,8 +18,8 @@ import { PoppyLogo } from "@/components/poppy/PoppyLogo";
 import { getCurrentUser } from "@/lib/auth";
 
 const HIDE_NAV = ["/welcome", "/login", "/signup"];
-// Quem não tem sessão só pode ver o login e o cadastro — tudo o resto exige conta.
-const PUBLIC_ROUTES = ["/login", "/signup"];
+// Quem não tem sessão só pode ver as boas-vindas, login e cadastro — tudo o resto exige conta.
+const PUBLIC_ROUTES = ["/welcome", "/login", "/signup"];
 
 function NotFoundComponent() {
   return (
@@ -149,7 +149,7 @@ function RootComponent() {
     if (getCurrentUser()) {
       setAuthState("authorized");
     } else {
-      router.navigate({ to: "/login", replace: true });
+      router.navigate({ to: "/welcome", replace: true });
     }
   }, [pathname, isPublicRoute]);
 
@@ -171,8 +171,14 @@ function RootComponent() {
 
 function AuthCheckingScreen() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <PoppyLogo size={40} className="animate-pulse" />
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4">
+      <div className="relative flex items-center justify-center">
+        <span className="absolute size-16 animate-ping rounded-full bg-primary/15" />
+        <span className="relative flex size-14 items-center justify-center rounded-2xl bg-card shadow-card">
+          <PoppyLogo size={30} />
+        </span>
+      </div>
+      <p className="text-sm font-medium text-muted-foreground">A carregar…</p>
     </div>
   );
 }

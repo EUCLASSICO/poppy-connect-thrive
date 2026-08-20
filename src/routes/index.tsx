@@ -14,7 +14,6 @@ import {
 import { Screen, SectionTitle } from "@/components/poppy/Screen";
 import { PoppyLogo } from "@/components/poppy/PoppyLogo";
 import { JobCard } from "@/components/poppy/JobCard";
-import { AdSlot } from "@/components/poppy/AdSlot";
 import { PromoBanner, type PromoSlide } from "@/components/poppy/PromoBanner";
 import { getCurrentUser } from "@/lib/auth";
 import { formatKz, jobs, me, quickJobs } from "@/lib/poppy-data";
@@ -70,17 +69,25 @@ const promoSlides: PromoSlide[] = [
   },
 ];
 
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Bom dia";
+  if (hour < 19) return "Boa tarde";
+  return "Boa noite";
+}
+
 function Home() {
   const account = getCurrentUser();
   const firstName = account?.fullName.split(" ")[0] ?? me.name;
   const recommended = jobs.filter((j) => j.featured);
+  const hasActivity = me.balance > 0 || me.pending > 0 || me.completed > 0;
 
   return (
     <Screen>
       <header className="sticky top-0 z-20 -mx-4 flex items-center gap-3 bg-background/85 px-4 py-3 backdrop-blur-lg">
         <PoppyLogo size={30} />
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground">Bem-vindo,</p>
+          <p className="text-xs text-muted-foreground">{greeting()},</p>
           <p className="truncate text-[15px] font-bold">{firstName}</p>
         </div>
         <Link
@@ -99,21 +106,38 @@ function Home() {
         <Search className="size-4 shrink-0 text-primary" /> Procurar micro tarefas, trabalhos, habilidades
       </Link>
 
-      {/* Saldo — cartão com leve destaque verde para se sentir "vivo" sem exagerar */}
-      <section className="shadow-card bg-primary-soft/60 mt-4 grid grid-cols-3 divide-x divide-primary/15 rounded-2xl border border-primary/15 p-4 text-center">
-        <div>
-          <p className="font-display text-lg font-bold text-foreground">{formatKz(me.balance)}</p>
-          <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Saldo</p>
-        </div>
-        <div>
-          <p className="font-display text-lg font-bold text-foreground">{formatKz(me.pending)}</p>
-          <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Pendente</p>
-        </div>
-        <div>
-          <p className="font-display text-lg font-bold text-primary">{me.completed}</p>
-          <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Tarefas feitas</p>
-        </div>
-      </section>
+      {hasActivity ? (
+        /* Saldo — cartão com leve destaque verde para se sentir "vivo" sem exagerar */
+        <section className="shadow-card bg-primary-soft/60 mt-4 grid grid-cols-3 divide-x divide-primary/15 rounded-2xl border border-primary/15 p-4 text-center">
+          <div>
+            <p className="font-display text-lg font-bold text-foreground">{formatKz(me.balance)}</p>
+            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Saldo</p>
+          </div>
+          <div>
+            <p className="font-display text-lg font-bold text-foreground">{formatKz(me.pending)}</p>
+            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Pendente</p>
+          </div>
+          <div>
+            <p className="font-display text-lg font-bold text-primary">{me.completed}</p>
+            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Tarefas feitas</p>
+          </div>
+        </section>
+      ) : (
+        /* Sem histórico ainda — convite a agir em vez de três zeros vazios */
+        <Link
+          to="/jobs"
+          className="shadow-card mt-4 flex items-center gap-3 rounded-2xl border border-primary/15 bg-primary-soft/60 p-4 transition-colors hover:border-primary/30"
+        >
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <Wallet className="size-[18px]" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">A sua carteira está vazia</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Aceite a primeira tarefa e comece a ganhar</p>
+          </div>
+          <ArrowRight className="size-4 shrink-0 text-primary" />
+        </Link>
+      )}
 
       <div className="mt-3 grid grid-cols-3 gap-2.5">
         {shortcuts.map(({ to, label, icon: Icon }) => (
@@ -192,8 +216,6 @@ function Home() {
           text="Sem trabalhos recomendados por agora. Complete o seu perfil para começar a receber sugestões."
         />
       )}
-
-      <AdSlot className="shadow-card mt-6" />
 
       <SectionTitle>Como funciona</SectionTitle>
       <div className="shadow-card divide-y divide-border/70 overflow-hidden rounded-2xl border border-border/70 bg-card">

@@ -268,22 +268,40 @@ function ProfilePage() {
           confirmar. Abaixo de 50% a conta fica temporariamente impedida de
           aceitar novas tarefas, até a taxa recuperar. */}
       <SectionTitle>Taxa de sucesso</SectionTitle>
-      <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
-        <SuccessRateRing value={me.successRate} />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">
-            {me.successRate <= successRateRules.minToAcceptTasks
-              ? "Conta temporariamente limitada"
-              : me.successRate >= 90
-                ? "Excelente reputação"
-                : "Boa reputação"}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {me.successRate <= successRateRules.minToAcceptTasks
-              ? `Abaixo de ${successRateRules.minToAcceptTasks}% não é possível aceitar novas tarefas. Conclua as tarefas pendentes para recuperar.`
-              : "Sobe quando uma tarefa é aprovada e desce com tarefas não aprovadas ou acumuladas por confirmar."}
-          </p>
+      <div
+        className={
+          "rounded-2xl border p-4 " +
+          (me.successRate <= successRateRules.minToAcceptTasks
+            ? "border-destructive/25 bg-destructive/5"
+            : "border-border bg-card")
+        }
+      >
+        <div className="flex items-center gap-4">
+          <SuccessRateRing value={me.successRate} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <p className="text-sm font-bold">Reputação</p>
+              <Badge
+                variant={me.successRate <= successRateRules.minToAcceptTasks ? "destructive" : "secondary"}
+                className="rounded-full text-[10px]"
+              >
+                {me.successRate <= successRateRules.minToAcceptTasks
+                  ? "Limitada"
+                  : me.successRate >= 90
+                    ? "Excelente"
+                    : "Boa"}
+              </Badge>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Sobe com tarefas aprovadas, desce com tarefas não aprovadas.
+            </p>
+          </div>
         </div>
+        {me.successRate <= successRateRules.minToAcceptTasks && (
+          <p className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-[11px] font-medium text-destructive">
+            Abaixo de {successRateRules.minToAcceptTasks}% não pode aceitar novas tarefas até recuperar.
+          </p>
+        )}
       </div>
 
       {/* Estatísticas */}

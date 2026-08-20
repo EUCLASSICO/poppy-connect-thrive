@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Bell,
-  FileText,
   PlusCircle,
   ShieldCheck,
   Sparkles,
@@ -73,7 +72,6 @@ function Home() {
   const account = getCurrentUser();
   const firstName = account?.fullName.split(" ")[0] ?? me.name;
   const recommended = jobs.filter((j) => j.featured);
-  const hasActivity = me.balance > 0 || me.pending > 0 || me.completed > 0;
 
   return (
     <Screen>
@@ -83,43 +81,31 @@ function Home() {
           <p className="text-xs text-muted-foreground">{greeting()},</p>
           <p className="truncate text-[15px] font-bold">{firstName}</p>
         </div>
+
+        {/* Carteira em resumo — sempre visível no canto, sem cartão grande no corpo da página */}
+        <Link
+          to="/billing"
+          className="flex shrink-0 items-stretch divide-x divide-border overflow-hidden rounded-xl border border-border/70 bg-card"
+          aria-label="Carteira"
+        >
+          <div className="px-2.5 py-1 text-right leading-tight">
+            <p className="text-[8px] font-semibold uppercase tracking-wide text-muted-foreground">Pendente</p>
+            <p className="text-[11px] font-bold text-foreground">{formatKz(me.pending)}</p>
+          </div>
+          <div className="px-2.5 py-1 text-right leading-tight">
+            <p className="text-[8px] font-semibold uppercase tracking-wide text-muted-foreground">Pago</p>
+            <p className="text-[11px] font-bold text-primary">{formatKz(me.balance)}</p>
+          </div>
+        </Link>
+
         <Link
           to="/settings"
-          className="flex size-9 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-primary-soft hover:text-primary"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-primary-soft hover:text-primary"
           aria-label="Notificações"
         >
           <Bell className="size-[18px]" />
         </Link>
       </header>
-
-      {hasActivity ? (
-        /* Saldo — apenas o que interessa: quanto está pendente e quanto já foi pago */
-        <section className="shadow-card bg-primary-soft/60 mt-4 grid grid-cols-2 divide-x divide-primary/15 rounded-2xl border border-primary/15 p-4 text-center">
-          <div>
-            <p className="font-display text-lg font-bold text-foreground">{formatKz(me.pending)}</p>
-            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Pendente</p>
-          </div>
-          <div>
-            <p className="font-display text-lg font-bold text-primary">{formatKz(me.balance)}</p>
-            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Pago</p>
-          </div>
-        </section>
-      ) : (
-        /* Sem histórico ainda — convite a agir em vez de zeros vazios */
-        <Link
-          to="/jobs"
-          className="shadow-card mt-4 flex items-center gap-3 rounded-2xl border border-primary/15 bg-primary-soft/60 p-4 transition-colors hover:border-primary/30"
-        >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Wallet className="size-[18px]" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">A sua carteira está vazia</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">Aceite a primeira tarefa e comece a ganhar</p>
-          </div>
-          <ArrowRight className="size-4 shrink-0 text-primary" />
-        </Link>
-      )}
 
       {/* Banner promocional — pequeno, troca sozinho, arrastável */}
       <PromoBanner slides={promoSlides} className="shadow-card mt-4" />
@@ -184,43 +170,6 @@ function Home() {
         />
       )}
 
-      <SectionTitle>Como funciona</SectionTitle>
-      <div className="shadow-card divide-y divide-border/70 overflow-hidden rounded-2xl border border-border/70 bg-card">
-        <div className="flex gap-3.5 p-4">
-          <span className="bg-primary-soft flex size-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-primary">
-            1
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="size-4 text-primary" />
-              <p className="text-sm font-semibold">Verifique a sua identidade</p>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Contas verificadas recebem mais convites e podem aceitar tarefas com valores mais altos.
-            </p>
-            <Link
-              to="/kyc"
-              className="mt-2 inline-flex items-center gap-0.5 text-xs font-semibold text-primary"
-            >
-              Verificar agora <ArrowRight className="size-3" />
-            </Link>
-          </div>
-        </div>
-        <div className="flex gap-3.5 p-4">
-          <span className="bg-accent-soft flex size-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-accent">
-            2
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <FileText className="size-4 text-accent" />
-              <p className="text-sm font-semibold">Envie propostas</p>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Escolha uma tarefa, envie a sua proposta e acompanhe o estado em "Trabalhos".
-            </p>
-          </div>
-        </div>
-      </div>
     </Screen>
   );
 }

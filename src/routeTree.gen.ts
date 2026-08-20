@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KycRouteImport } from './routes/kyc'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -33,6 +34,11 @@ const KycRoute = KycRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostRoute = PostRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/kyc'
     | '/login'
+    | '/messages'
     | '/post'
     | '/profile'
     | '/settings'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/kyc'
     | '/login'
+    | '/messages'
     | '/post'
     | '/profile'
     | '/settings'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/kyc'
     | '/login'
+    | '/messages'
     | '/post'
     | '/profile'
     | '/settings'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   KycRoute: typeof KycRoute
   LoginRoute: typeof LoginRoute
+  MessagesRoute: typeof MessagesRoute
   PostRoute: typeof PostRoute
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post': {
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   KycRoute: KycRoute,
   LoginRoute: LoginRoute,
+  MessagesRoute: MessagesRoute,
   PostRoute: PostRoute,
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,

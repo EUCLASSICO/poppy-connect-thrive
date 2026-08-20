@@ -4,7 +4,6 @@ import {
   Bell,
   FileText,
   PlusCircle,
-  Search,
   ShieldCheck,
   Sparkles,
   Wallet,
@@ -32,12 +31,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
-
-const shortcuts = [
-  { to: "/jobs", label: "Trabalhos", icon: Zap },
-  { to: "/post", label: "Publicar", icon: PlusCircle },
-  { to: "/kyc", label: "Verificação", icon: ShieldCheck },
-] as const;
 
 const promoSlides: PromoSlide[] = [
   {
@@ -99,31 +92,20 @@ function Home() {
         </Link>
       </header>
 
-      <Link
-        to="/jobs"
-        className="shadow-card mt-1 flex items-center gap-2.5 rounded-2xl border border-border/70 bg-card px-4 py-3.5 text-sm text-muted-foreground transition-colors hover:border-primary/30"
-      >
-        <Search className="size-4 shrink-0 text-primary" /> Procurar micro tarefas, trabalhos, habilidades
-      </Link>
-
       {hasActivity ? (
-        /* Saldo — cartão com leve destaque verde para se sentir "vivo" sem exagerar */
-        <section className="shadow-card bg-primary-soft/60 mt-4 grid grid-cols-3 divide-x divide-primary/15 rounded-2xl border border-primary/15 p-4 text-center">
-          <div>
-            <p className="font-display text-lg font-bold text-foreground">{formatKz(me.balance)}</p>
-            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Saldo</p>
-          </div>
+        /* Saldo — apenas o que interessa: quanto está pendente e quanto já foi pago */
+        <section className="shadow-card bg-primary-soft/60 mt-4 grid grid-cols-2 divide-x divide-primary/15 rounded-2xl border border-primary/15 p-4 text-center">
           <div>
             <p className="font-display text-lg font-bold text-foreground">{formatKz(me.pending)}</p>
             <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Pendente</p>
           </div>
           <div>
-            <p className="font-display text-lg font-bold text-primary">{me.completed}</p>
-            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Tarefas feitas</p>
+            <p className="font-display text-lg font-bold text-primary">{formatKz(me.balance)}</p>
+            <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Pago</p>
           </div>
         </section>
       ) : (
-        /* Sem histórico ainda — convite a agir em vez de três zeros vazios */
+        /* Sem histórico ainda — convite a agir em vez de zeros vazios */
         <Link
           to="/jobs"
           className="shadow-card mt-4 flex items-center gap-3 rounded-2xl border border-primary/15 bg-primary-soft/60 p-4 transition-colors hover:border-primary/30"
@@ -138,21 +120,6 @@ function Home() {
           <ArrowRight className="size-4 shrink-0 text-primary" />
         </Link>
       )}
-
-      <div className="mt-3 grid grid-cols-3 gap-2.5">
-        {shortcuts.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className="shadow-card flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-border/70 bg-card py-3.5 text-center transition-colors hover:border-primary/30 hover:bg-primary-soft/40"
-          >
-            <span className="bg-primary-soft flex size-9 items-center justify-center rounded-xl text-primary">
-              <Icon className="size-4" />
-            </span>
-            <span className="text-[11px] font-semibold">{label}</span>
-          </Link>
-        ))}
-      </div>
 
       {/* Banner promocional — pequeno, troca sozinho, arrastável */}
       <PromoBanner slides={promoSlides} className="shadow-card mt-4" />

@@ -1,29 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Bell,
-  Camera,
-  ClipboardList,
-  Code2,
-  FileText,
-  Headphones,
-  Languages,
-  Megaphone,
-  MoreHorizontal,
-  PenTool,
-  PlusCircle,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  Video,
-  Zap,
-} from "lucide-react";
+import { Bell, FileText, PlusCircle, Search, ShieldCheck, Sparkles, Zap } from "lucide-react";
 
 import { Screen, SectionTitle } from "@/components/poppy/Screen";
 import { PoppyLogo } from "@/components/poppy/PoppyLogo";
 import { JobCard } from "@/components/poppy/JobCard";
 import { AdSlot } from "@/components/poppy/AdSlot";
 import { getCurrentUser } from "@/lib/auth";
-import { categories, formatKz, jobs, me, quickJobs } from "@/lib/poppy-data";
+import { formatKz, jobs, me, quickJobs } from "@/lib/poppy-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,31 +17,18 @@ export const Route = createFileRoute("/")({
         content: "Poppy: encontre micro tarefas rápidas e trabalhos freelance, envie propostas e receba o pagamento na sua carteira.",
       },
       { property: "og:title", content: "Poppy — Micro tarefas e trabalho freelance" },
-      { property: "og:description", content: "Micro tarefas, categorias e trabalhos recomendados, tudo num só lugar." },
+      { property: "og:description", content: "Micro tarefas e trabalhos recomendados, tudo num só lugar." },
     ],
   }),
   component: Home,
 });
-
-const icons: Record<string, typeof Code2> = {
-  PenTool,
-  Code2,
-  Megaphone,
-  Languages,
-  FileText,
-  Camera,
-  Video,
-  Headphones,
-  ClipboardList,
-  Zap,
-  MoreHorizontal,
-};
 
 const shortcuts = [
   { to: "/jobs", label: "Trabalhos", icon: Zap },
   { to: "/post", label: "Publicar", icon: PlusCircle },
   { to: "/kyc", label: "Verificação", icon: ShieldCheck },
 ] as const;
+
 
 function Home() {
   const account = getCurrentUser();

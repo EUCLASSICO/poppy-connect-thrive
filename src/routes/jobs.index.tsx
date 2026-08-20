@@ -1,16 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { JobCard } from "@/components/poppy/JobCard";
 import { Screen } from "@/components/poppy/Screen";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
-import { categories, formatKz, jobs } from "@/lib/poppy-data";
+import { formatKz, jobs } from "@/lib/poppy-data";
 
 type Search = { category?: string };
 
@@ -69,7 +68,6 @@ function JobsPage() {
     [category, query, type, level, deadline, minBudget, maxDistance],
   );
 
-  const activeCategory = categories.find((c) => c.id === category);
 
   return (
     <Screen>

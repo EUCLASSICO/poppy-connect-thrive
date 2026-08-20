@@ -1,5 +1,7 @@
 export type JobType = "Remoto" | "Presencial" | "Híbrido";
 
+export type JobTier = "Iniciante" | "Bronze" | "Prata" | "Ouro" | "Profissional";
+
 export type Job = {
   id: string;
   title: string;
@@ -17,9 +19,22 @@ export type Job = {
   level: "Iniciante" | "Intermediário" | "Avançado";
   distanceKm?: number;
   featured?: boolean;
+  /** Trabalho expresso: pagamento e aprovação mais rápidos. */
+  express?: boolean;
+  /** Nível mínimo do trabalhador exigido para aceitar o trabalho. */
+  tier?: JobTier;
+  /** Vagas/posições disponíveis para este trabalho (micro tarefas com várias vagas). */
+  slotsTotal?: number;
+  slotsRemaining?: number;
+  /** Rótulo curto do ritmo de pagamento, ex: "taxa diária", "por tarefa". */
+  rateLabel?: string;
   description: string;
   requirements: string[];
 };
+
+/** Sigla curta do nível para exibir em selo, ex: "INI", "INT", "AVA". */
+export const levelCode = (level: Job["level"]) =>
+  ({ Iniciante: "INI", Intermediário: "INT", Avançado: "AVA" })[level];
 
 export const categories = [
   { id: "design", name: "Design", icon: "PenTool" },

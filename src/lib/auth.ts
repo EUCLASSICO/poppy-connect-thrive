@@ -63,6 +63,8 @@ export type PoppyUser = {
   bio?: string;
   skills?: string[];
   paymentMethods?: PaymentMethod[];
+  /** Data de criação da conta, em ISO 8601. Contas antigas podem não ter este campo. */
+  createdAt?: string;
 };
 
 const USERS_KEY = "poppy_users";
@@ -96,8 +98,13 @@ export function isUsernameTaken(username: string): boolean {
   return readUsers().some((u) => u.username.toLowerCase() === username.toLowerCase());
 }
 
-export function createUser(data: Omit<PoppyUser, "id" | "kycStatus">): PoppyUser {
-  const user: PoppyUser = { ...data, id: generateUserId(), kycStatus: "não verificado" };
+export function createUser(data: Omit<PoppyUser, "id" | "kycStatus" | "createdAt">): PoppyUser {
+  const user: PoppyUser = {
+    ...data,
+    id: generateUserId(),
+    kycStatus: "não verificado",
+    createdAt: new Date().toISOString(),
+  };
   const users = readUsers();
   users.push(user);
   writeUsers(users);

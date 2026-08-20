@@ -92,9 +92,10 @@ function updateUser(id: string, patch: Partial<PoppyUser>): PoppyUser | null {
   const users = readUsers();
   const index = users.findIndex((u) => u.id === id);
   if (index === -1) return null;
-  users[index] = { ...users[index], ...patch };
+  const updated: PoppyUser = { ...(users[index] as PoppyUser), ...patch };
+  users[index] = updated;
   writeUsers(users);
-  return users[index];
+  return updated;
 }
 
 /** Troca a senha, validando a senha atual */
@@ -116,7 +117,6 @@ export function submitKycDocuments(id: string, documents: KycDocuments): PoppyUs
     kycStatus: "pendente",
     kycDocuments: documents,
     kycSubmittedAt: new Date().toISOString(),
-    kycNote: undefined,
     address: documents.address,
     phone: documents.phone,
   });

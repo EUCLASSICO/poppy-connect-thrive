@@ -11,11 +11,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Slider } from "@/components/ui/slider";
 import { formatKz, jobs } from "@/lib/poppy-data";
 
-type Search = { category?: string };
+type Search = { category?: string | undefined };
 
 export const Route = createFileRoute("/jobs/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    category: typeof search.category === "string" ? search.category : undefined,
+    category: typeof search['category'] === "string" ? (search['category'] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -37,7 +37,7 @@ const deadlines = ["Qualquer", "Até 7 dias", "Até 15 dias", "Mais de 15 dias"]
 
 function JobsPage() {
   const { category } = Route.useSearch();
-  const navigate = useNavigate({ from: "/jobs" });
+  const navigate = useNavigate({ from: "/jobs/" });
   const [query, setQuery] = useState("");
   const [type, setType] = useState<(typeof types)[number]>("Todos");
   const [level, setLevel] = useState<(typeof levels)[number]>("Todos");
@@ -113,7 +113,7 @@ function JobsPage() {
                     value={[minBudget]}
                     max={1000000}
                     step={20000}
-                    onValueChange={(v) => setMinBudget(v[0])}
+                    onValueChange={(v) => setMinBudget(v[0] ?? 0)}
                   />
                 </div>
                 <div>
@@ -123,7 +123,7 @@ function JobsPage() {
                     value={[maxDistance]}
                     max={50}
                     step={1}
-                    onValueChange={(v) => setMaxDistance(v[0])}
+                    onValueChange={(v) => setMaxDistance(v[0] ?? 50)}
                   />
                 </div>
               </div>
@@ -168,7 +168,7 @@ function JobsPage() {
               variant="outline"
               size="sm"
               className="mt-4 rounded-xl"
-              onClick={() => navigate({ search: {} })}
+              onClick={() => navigate({ search: { category: undefined } })}
             >
               Limpar filtros
             </Button>

@@ -138,31 +138,14 @@ function JobsPage() {
           placeholder="Procurar por título, empresa ou habilidade"
           className="mt-3 rounded-xl"
         />
-        <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
-          <Chip active={!category} onClick={() => navigate({ search: {} })}>
-            Todas
-          </Chip>
-          {categories.map((c) => (
-            <Chip key={c.id} active={category === c.id} onClick={() => navigate({ search: { category: c.id } })}>
-              {c.name}
-            </Chip>
-          ))}
-        </div>
       </header>
 
       <div className="mb-3 flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
           {results.length} trabalho{results.length === 1 ? "" : "s"} encontrado{results.length === 1 ? "" : "s"}
         </p>
-        {activeCategory && (
-          <Badge variant="secondary" className="rounded-full">
-            {activeCategory.name}
-            <button onClick={() => navigate({ search: {} })} aria-label="Remover filtro">
-              <X className="ml-1 size-3" />
-            </button>
-          </Badge>
-        )}
       </div>
+
 
       <div className="space-y-3">
         {results.map((job) => (

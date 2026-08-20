@@ -117,38 +117,8 @@ function Home() {
         ))}
       </div>
 
-      {/* Categorias — como numa loja de micro tarefas: navegação por tipo de trabalho */}
-      <SectionTitle
-        action={
-          <Link to="/jobs" className="text-xs font-semibold text-primary">
-            Ver tudo
-          </Link>
-        }
-      >
-        Categorias
-      </SectionTitle>
-      <div className="no-scrollbar -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1">
-        {categories.map((c) => {
-          const Icon = icons[c.icon] ?? MoreHorizontal;
-          const count = jobs.filter((j) => j.category === c.id).length;
-          return (
-            <Link
-              key={c.id}
-              to="/jobs"
-              search={{ category: c.id }}
-              className="flex w-28 shrink-0 flex-col items-start gap-2 rounded-2xl border border-border bg-card p-3"
-            >
-              <span className="flex size-8 items-center justify-center rounded-lg bg-primary-soft text-primary">
-                <Icon className="size-4" />
-              </span>
-              <span className="text-[11px] font-semibold leading-tight">{c.name}</span>
-              <span className="text-[10px] text-muted-foreground">
-                {count > 0 ? `${count} vagas` : "Em breve"}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      {/* Categorias removidas: a navegação passa direta para as tarefas reais */}
+
 
       <SectionTitle
         action={

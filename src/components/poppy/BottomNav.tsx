@@ -24,7 +24,7 @@ export function BottomNav() {
             return (
               <li key={to} className="flex-1">
                 <Link to={to} className="flex flex-col items-center gap-1" aria-label={label}>
-                  <span className="bg-gradient-accent shadow-float -mt-5 flex size-12 items-center justify-center rounded-2xl text-primary-foreground">
+                  <span className="bg-gradient-accent shadow-float -mt-5 flex size-12 items-center justify-center rounded-2xl text-accent-foreground">
                     <Icon className="size-6" />
                   </span>
                   <span className="text-[10px] font-semibold text-muted-foreground">{label}</span>

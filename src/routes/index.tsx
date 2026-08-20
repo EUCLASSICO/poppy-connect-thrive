@@ -87,7 +87,8 @@ function Home() {
         ))}
       </div>
 
-      {/* Categorias removidas: a navegação passa direta para as tarefas reais */}
+
+
 
 
       <SectionTitle

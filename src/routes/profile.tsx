@@ -277,8 +277,19 @@ function ProfilePage() {
       </section>
 
       {/* Carteira */}
-      <SectionTitle>Carteira</SectionTitle>
-      <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4">
+      <SectionTitle
+        action={
+          <Link to="/billing" className="text-xs font-semibold text-primary">
+            Ver tudo
+          </Link>
+        }
+      >
+        Carteira
+      </SectionTitle>
+      <Link
+        to="/billing"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary"
+      >
         <div className="flex items-center gap-3">
           <span className="bg-primary-soft flex size-10 items-center justify-center rounded-xl text-primary">
             <Wallet className="size-5" />
@@ -288,8 +299,11 @@ function ProfilePage() {
             <p className="text-xs text-muted-foreground">Pendente: {formatKz(me.pending)}</p>
           </div>
         </div>
-        <p className="font-display text-base font-bold">{formatKz(me.balance)}</p>
-      </div>
+        <div className="flex items-center gap-1">
+          <p className="font-display text-base font-bold">{formatKz(me.balance)}</p>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </div>
+      </Link>
 
       {/* Conta */}
       {account && (

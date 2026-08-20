@@ -32,6 +32,19 @@ export type KycDocuments = {
   phone: string;
 };
 
+export type PaymentMethodType = "paypay" | "unitel_money" | "bank_transfer";
+
+export type PaymentMethod = {
+  id: string;
+  type: PaymentMethodType;
+  accountName: string;
+  /** Usado por PayPay África e Transferência bancária */
+  iban?: string;
+  /** Usado por Unitel Money */
+  phone?: string;
+  createdAt: string;
+};
+
 export type PoppyUser = {
   id: string;
   fullName: string;
@@ -49,6 +62,7 @@ export type PoppyUser = {
   avatarUrl?: string;
   bio?: string;
   skills?: string[];
+  paymentMethods?: PaymentMethod[];
 };
 
 const USERS_KEY = "poppy_users";
@@ -157,6 +171,41 @@ export function login(idOrEmail: string, password: string): PoppyUser | null {
 
 export function logout() {
   window.localStorage.removeItem(SESSION_KEY);
+}
+
+/** Adiciona um método de pagamento à conta, para não ter de o introduzir sempre */
+export function addPaymentMethod(
+  id: string,
+  method: Omit<PaymentMethod, "id" | "createdAt">,
+): PoppyUser | null {
+  const users = readUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+  const user = users[index] as PoppyUser;
+  const newMethod: PaymentMethod = {
+    ...method,
+    id: `pm_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    createdAt: new Date().toISOString(),
+  };
+  const updated: PoppyUser = { ...user, paymentMethods: [...(user.paymentMethods ?? []), newMethod] };
+  users[index] = updated;
+  writeUsers(users);
+  return updated;
+}
+
+/** Remove um método de pagamento guardado */
+export function removePaymentMethod(id: string, methodId: string): PoppyUser | null {
+  const users = readUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+  const user = users[index] as PoppyUser;
+  const updated: PoppyUser = {
+    ...user,
+    paymentMethods: (user.paymentMethods ?? []).filter((m) => m.id !== methodId),
+  };
+  users[index] = updated;
+  writeUsers(users);
+  return updated;
 }
 
 export function getCurrentUser(): PoppyUser | null {

@@ -1,8 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  Award,
   AlertOctagon,
   Bell,
+  Calendar,
   Camera,
+  CheckCircle2,
   ChevronRight,
   Loader2,
   LogOut,
@@ -13,6 +16,7 @@ import {
   ShieldCheck,
   Star,
   Trash2,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
 import { useRef, useState } from "react";
@@ -157,72 +161,106 @@ function ProfilePage() {
         </Link>
       </header>
 
-      {/* Cabeçalho do perfil — cartão limpo, informação essencial */}
-      <section className="shadow-card mt-1 rounded-3xl border border-border bg-card p-5">
-        <div className="flex items-center gap-4">
-          <div className="relative shrink-0">
-            <Avatar className="size-16 border border-border">
-              {account?.avatarUrl && <AvatarImage src={account.avatarUrl} alt={name} />}
-              <AvatarFallback className="bg-primary-soft text-xl font-bold text-primary">
-                {initials(name)}
-              </AvatarFallback>
-            </Avatar>
-            {account && (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadingPhoto}
-                aria-label="Alterar foto de perfil"
-                className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground"
-              >
-                {uploadingPhoto ? (
-                  <Loader2 className="size-3 animate-spin" />
-                ) : (
-                  <Camera className="size-3" />
-                )}
-              </button>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handlePhotoChange}
-            />
+      {/* Cabeçalho do perfil — layout centrado com selo de nível sobre a foto */}
+      <section className="shadow-card mt-1 rounded-3xl border border-border bg-card p-6 text-center">
+        <div className="relative mx-auto w-fit">
+          <Avatar className="size-24 border border-border">
+            {account?.avatarUrl && <AvatarImage src={account.avatarUrl} alt={name} />}
+            <AvatarFallback className="bg-primary-soft text-2xl font-bold text-primary">
+              {initials(name)}
+            </AvatarFallback>
+          </Avatar>
+          {account && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingPhoto}
+              aria-label="Alterar foto de perfil"
+              className="absolute -left-1 -top-1 flex size-7 items-center justify-center rounded-full border-2 border-card bg-secondary text-secondary-foreground"
+            >
+              {uploadingPhoto ? <Loader2 className="size-3.5 animate-spin" /> : <Camera className="size-3.5" />}
+            </button>
+          )}
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+
+          {/* Selo de nível — sobreposto à foto, como no cartão de referência */}
+          <div className="absolute -bottom-2 -right-3 flex size-14 flex-col items-center justify-center rounded-full border-4 border-card bg-primary text-center leading-none text-primary-foreground shadow-md">
+            <span className="text-[7px] font-bold uppercase tracking-wide">Nível</span>
+            <span className="text-[9px] font-extrabold uppercase leading-tight">{me.level}</span>
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <p className="truncate text-base font-bold">{name}</p>
-              {account?.kycStatus === "verificado" && (
-                <span
-                  className="stamp-badge size-8 shrink-0 text-[9px] font-bold text-primary"
-                  title="Identidade verificada"
-                >
-                  OK
-                </span>
-              )}
-            </div>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">
-              {account ? `@${account.username}` : me.role}
-            </p>
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <Badge variant="secondary" className="rounded-full text-[10px]">
-                Nível {me.level}
-              </Badge>
-              {account && (
-                <Badge variant="outline" className="rounded-full text-[10px]">
-                  {account.kycStatus}
-                </Badge>
-              )}
-            </div>
+        </div>
+
+        <p className="mt-4 truncate text-lg font-bold">{name}</p>
+        <p className="mt-0.5 truncate text-sm text-muted-foreground">
+          {account?.skills?.[0] ?? me.role}
+        </p>
+
+        <div className="mt-2 flex items-center justify-center gap-1.5">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <Star
+                key={n}
+                className={
+                  "size-4 " +
+                  (n <= Math.round(me.rating) ? "fill-warning text-warning" : "fill-transparent text-border")
+                }
+              />
+            ))}
           </div>
-          <Link
-            to="/settings"
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
-            aria-label="Definições"
-          >
-            <Settings className="size-4" />
-          </Link>
+          {me.reviews > 0 ? (
+            <span className="text-sm font-bold">
+              {me.rating.toFixed(1)} <span className="font-normal text-muted-foreground">({me.reviews} avaliações)</span>
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground">Ainda sem avaliações</span>
+          )}
+        </div>
+
+        <div className="mt-4 flex gap-2">
+          {account ? (
+            <Dialog
+              open={bioOpen}
+              onOpenChange={(open) => {
+                setBioOpen(open);
+                if (open) setBioDraft(account.bio ?? "");
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button className="flex-1 rounded-xl">Editar perfil</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-sm rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle>Biografia</DialogTitle>
+                </DialogHeader>
+                <Textarea
+                  value={bioDraft}
+                  onChange={(e) => setBioDraft(e.target.value)}
+                  placeholder="Conte às empresas o que sabe fazer..."
+                  maxLength={300}
+                  rows={5}
+                  className="rounded-xl"
+                />
+                <p className="text-right text-[11px] text-muted-foreground">{bioDraft.length}/300</p>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setBioOpen(false)} className="rounded-xl">
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleSaveBio} disabled={savingBio} className="rounded-xl">
+                    {savingBio ? "A guardar..." : "Guardar"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <Button asChild className="flex-1 rounded-xl">
+              <Link to="/login">Editar perfil</Link>
+            </Button>
+          )}
+          <Button asChild variant="outline" className="flex-1 rounded-xl">
+            <Link to="/settings">
+              <Settings className="size-4" /> Definições
+            </Link>
+          </Button>
         </div>
 
         <div className="mt-4 flex items-center justify-between text-[11px] text-muted-foreground">
@@ -230,38 +268,50 @@ function ProfilePage() {
           <span>{me.levelProgress}% para {levels[Math.min(levelIndex + 1, levels.length - 1)]}</span>
         </div>
         <Progress value={me.levelProgress} className="mt-2 h-2" />
-      </section>
 
-      {/* Avaliação — sempre visível, em estrelas */}
-      <SectionTitle>Avaliação</SectionTitle>
-      <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
-        <div className="flex shrink-0 items-center gap-0.5">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <Star
-              key={n}
-              className={
-                "size-5 " +
-                (n <= Math.round(me.rating) ? "fill-warning text-warning" : "fill-transparent text-border")
-              }
-            />
-          ))}
+        {/* Verificação — espelha o "Verified by" + selo PRO do cartão de referência */}
+        {(account?.kycStatus === "verificado" || account?.skills?.length || levelIndex === levels.length - 1) && (
+          <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-left">
+            <div className="min-w-0 space-y-1.5">
+              {account?.kycStatus === "verificado" && (
+                <p className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                  <CheckCircle2 className="size-3.5 shrink-0 text-primary" /> Identidade verificada pela Poppy
+                </p>
+              )}
+              {account?.skills?.[0] && (
+                <p className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                  <CheckCircle2 className="size-3.5 shrink-0 text-primary" /> {account.skills[0]}
+                </p>
+              )}
+            </div>
+            {levelIndex === levels.length - 1 && (
+              <span
+                className="flex shrink-0 flex-col items-center gap-0.5 rounded-md bg-foreground px-2 py-1.5 text-card"
+                title="Nível máximo Poppy"
+              >
+                <Award className="size-3.5" />
+                <span className="text-[8px] font-bold tracking-wide">PRO</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Informação — mesmo formato de linhas do cartão de referência */}
+        <div className="mt-4 space-y-2.5 border-t border-border pt-4 text-left text-xs">
+          <InfoRow icon={MapPin} label="De" value={account?.country ?? "—"} />
+          <InfoRow
+            icon={Calendar}
+            label="Membro desde"
+            value={
+              account?.createdAt
+                ? new Date(account.createdAt).toLocaleDateString("pt-PT", { month: "short", year: "numeric" })
+                : "—"
+            }
+          />
+          <InfoRow icon={TrendingUp} label="Taxa de sucesso" value={`${me.successRate}%`} />
+          <InfoRow icon={CheckCircle2} label="Trabalhos concluídos" value={`${me.completed}`} />
         </div>
-        <div className="min-w-0">
-          {me.reviews > 0 ? (
-            <>
-              <p className="text-sm font-bold">{me.rating.toFixed(1)} de 5</p>
-              <p className="text-xs text-muted-foreground">Com base em {me.reviews} avaliações</p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-bold">Ainda sem avaliações</p>
-              <p className="text-xs text-muted-foreground">
-                A sua avaliação aparece aqui depois do primeiro trabalho concluído.
-              </p>
-            </>
-          )}
-        </div>
-      </div>
+      </section>
 
       {/* Taxa de sucesso — reputação do trabalhador. Sobe quando uma tarefa é
           aprovada; desce com tarefas não aprovadas ou tarefas acumuladas por
@@ -303,20 +353,6 @@ function ProfilePage() {
           </p>
         )}
       </div>
-
-      {/* Estatísticas */}
-      <section className="mt-3 grid grid-cols-2 gap-2">
-        <div className="rounded-2xl border border-border bg-card p-3 text-center">
-          <p className="font-display text-lg font-bold text-foreground">
-            {me.completed > 0 ? `${me.completion}%` : "—"}
-          </p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">Conclusão</p>
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-3 text-center">
-          <p className="font-display text-lg font-bold text-foreground">{me.completed}</p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">Trabalhos feitos</p>
-        </div>
-      </section>
 
       {/* Carteira */}
       <SectionTitle
@@ -367,45 +403,21 @@ function ProfilePage() {
         </>
       )}
 
-      {/* Sobre */}
+      {/* Sobre — edição de biografia acontece pelo botão "Editar perfil" no topo */}
       <SectionTitle
         action={
           account && (
-            <Dialog
-              open={bioOpen}
-              onOpenChange={(open) => {
-                setBioOpen(open);
-                if (open) setBioDraft(account.bio ?? "");
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto gap-1 px-2 py-1 text-xs font-semibold text-primary"
+              onClick={() => {
+                setBioDraft(account.bio ?? "");
+                setBioOpen(true);
               }}
             >
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-auto gap-1 px-2 py-1 text-xs font-semibold text-primary">
-                  <Pencil className="size-3" /> Editar
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-sm rounded-2xl">
-                <DialogHeader>
-                  <DialogTitle>Biografia</DialogTitle>
-                </DialogHeader>
-                <Textarea
-                  value={bioDraft}
-                  onChange={(e) => setBioDraft(e.target.value)}
-                  placeholder="Conte às empresas o que sabe fazer..."
-                  maxLength={300}
-                  rows={5}
-                  className="rounded-xl"
-                />
-                <p className="text-right text-[11px] text-muted-foreground">{bioDraft.length}/300</p>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setBioOpen(false)} className="rounded-xl">
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleSaveBio} disabled={savingBio} className="rounded-xl">
-                    {savingBio ? "A guardar..." : "Guardar"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+              <Pencil className="size-3" /> Editar
+            </Button>
           )
         }
       >
@@ -486,6 +498,24 @@ function Row({
       <Icon className="size-4 shrink-0 text-muted-foreground" />
       <p className="text-sm font-semibold">{label}</p>
       <p className="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">{value}</p>
+    </div>
+  );
+}
+
+function InfoRow({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Mail;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Icon className="size-3.5 shrink-0 text-muted-foreground" />
+      <span className="text-muted-foreground">{label}</span>
+      <span className="ml-auto font-bold text-foreground">{value}</span>
     </div>
   );
 }

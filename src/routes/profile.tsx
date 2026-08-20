@@ -283,3 +283,21 @@ function ProfilePage() {
     </Screen>
   );
 }
+
+function Row({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Mail;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 p-4">
+      <Icon className="size-4 shrink-0 text-muted-foreground" />
+      <p className="text-sm font-semibold">{label}</p>
+      <p className="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">{value}</p>
+    </div>
+  );
+}

@@ -46,6 +46,9 @@ export type PoppyUser = {
   kycDocuments?: KycDocuments;
   kycSubmittedAt?: string;
   kycNote?: string;
+  avatarUrl?: string;
+  bio?: string;
+  skills?: string[];
 };
 
 const USERS_KEY = "poppy_users";
@@ -96,6 +99,14 @@ function updateUser(id: string, patch: Partial<PoppyUser>): PoppyUser | null {
   users[index] = updated;
   writeUsers(users);
   return updated;
+}
+
+/** Atualiza foto de perfil, biografia e/ou habilidades */
+export function updateProfile(
+  id: string,
+  patch: Partial<Pick<PoppyUser, "avatarUrl" | "bio" | "skills" | "fullName">>,
+): PoppyUser | null {
+  return updateUser(id, patch);
 }
 
 /** Troca a senha, validando a senha atual */

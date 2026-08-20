@@ -2,17 +2,20 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertOctagon,
   Bell,
+  Camera,
   ChevronRight,
+  Loader2,
   LogOut,
   Mail,
   MapPin,
+  Pencil,
   Settings,
   ShieldCheck,
   Star,
   Trash2,
   Wallet,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -26,12 +29,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Screen, SectionTitle } from "@/components/poppy/Screen";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { deleteAccount, getCurrentUser, logout, type KycStatus } from "@/lib/auth";
+import { Textarea } from "@/components/ui/textarea";
+import { deleteAccount, getCurrentUser, logout, updateProfile, type KycStatus, type PoppyUser } from "@/lib/auth";
+import { resizeImageToDataUrl } from "@/lib/image";
 import { formatKz, levels, me } from "@/lib/poppy-data";
 
 const kycLabel: Record<KycStatus, string> = {
@@ -69,10 +82,16 @@ function initials(name: string) {
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const account = getCurrentUser();
+  const [account, setAccount] = useState<PoppyUser | null>(() => getCurrentUser());
   const name = account?.fullName ?? me.name;
   const levelIndex = Math.max(levels.indexOf(me.level), 0);
   const [deleting, setDeleting] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [bioDraft, setBioDraft] = useState(account?.bio ?? "");
+  const [bioOpen, setBioOpen] = useState(false);
+  const [savingBio, setSavingBio] = useState(false);
 
   function handleDeleteAccount() {
     if (!account) return;
@@ -84,6 +103,43 @@ function ProfilePage() {
       navigate({ to: "/signup" });
     } else {
       toast.error("Não foi possível eliminar a conta.");
+    }
+  }
+
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !account) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Escolha um ficheiro de imagem.");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const dataUrl = await resizeImageToDataUrl(file);
+      const updated = updateProfile(account.id, { avatarUrl: dataUrl });
+      if (updated) {
+        setAccount(updated);
+        toast.success("Foto de perfil atualizada.");
+      }
+    } catch {
+      toast.error("Não foi possível processar a imagem.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
+
+  function handleSaveBio() {
+    if (!account) return;
+    setSavingBio(true);
+    const updated = updateProfile(account.id, { bio: bioDraft.trim() });
+    setSavingBio(false);
+    if (updated) {
+      setAccount(updated);
+      setBioOpen(false);
+      toast.success("Biografia atualizada.");
     }
   }
 
@@ -103,11 +159,36 @@ function ProfilePage() {
       {/* Cabeçalho do perfil — cartão limpo, informação essencial */}
       <section className="shadow-card mt-1 rounded-3xl border border-border bg-card p-5">
         <div className="flex items-center gap-4">
-          <Avatar className="size-16 border border-border">
-            <AvatarFallback className="bg-primary-soft text-xl font-bold text-primary">
-              {initials(name)}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative shrink-0">
+            <Avatar className="size-16 border border-border">
+              {account?.avatarUrl && <AvatarImage src={account.avatarUrl} alt={name} />}
+              <AvatarFallback className="bg-primary-soft text-xl font-bold text-primary">
+                {initials(name)}
+              </AvatarFallback>
+            </Avatar>
+            {account && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPhoto}
+                aria-label="Alterar foto de perfil"
+                className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground"
+              >
+                {uploadingPhoto ? (
+                  <Loader2 className="size-3 animate-spin" />
+                ) : (
+                  <Camera className="size-3" />
+                )}
+              </button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoChange}
+            />
+          </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <p className="truncate text-base font-bold">{name}</p>
@@ -150,17 +231,39 @@ function ProfilePage() {
         <Progress value={me.levelProgress} className="mt-2 h-2" />
       </section>
 
-      {/* Estatísticas */}
-      <section className="mt-3 grid grid-cols-3 gap-2">
-        <div className="rounded-2xl border border-border bg-card p-3 text-center">
-          <div className="flex items-center justify-center gap-1 text-warning">
-            <Star className="size-4 fill-current" />
-            <span className="font-display text-lg font-bold text-foreground">
-              {me.reviews > 0 ? me.rating : "—"}
-            </span>
-          </div>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">{me.reviews} avaliações</p>
+      {/* Avaliação — sempre visível, em estrelas */}
+      <SectionTitle>Avaliação</SectionTitle>
+      <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
+        <div className="flex shrink-0 items-center gap-0.5">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <Star
+              key={n}
+              className={
+                "size-5 " +
+                (n <= Math.round(me.rating) ? "fill-warning text-warning" : "fill-transparent text-border")
+              }
+            />
+          ))}
         </div>
+        <div className="min-w-0">
+          {me.reviews > 0 ? (
+            <>
+              <p className="text-sm font-bold">{me.rating.toFixed(1)} de 5</p>
+              <p className="text-xs text-muted-foreground">Com base em {me.reviews} avaliações</p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-bold">Ainda sem avaliações</p>
+              <p className="text-xs text-muted-foreground">
+                A sua avaliação aparece aqui depois do primeiro trabalho concluído.
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Estatísticas */}
+      <section className="mt-3 grid grid-cols-2 gap-2">
         <div className="rounded-2xl border border-border bg-card p-3 text-center">
           <p className="font-display text-lg font-bold text-foreground">
             {me.completed > 0 ? `${me.completion}%` : "—"}
@@ -209,10 +312,53 @@ function ProfilePage() {
       )}
 
       {/* Sobre */}
-      <SectionTitle>Sobre</SectionTitle>
+      <SectionTitle
+        action={
+          account && (
+            <Dialog
+              open={bioOpen}
+              onOpenChange={(open) => {
+                setBioOpen(open);
+                if (open) setBioDraft(account.bio ?? "");
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-auto gap-1 px-2 py-1 text-xs font-semibold text-primary">
+                  <Pencil className="size-3" /> Editar
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-sm rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle>Biografia</DialogTitle>
+                </DialogHeader>
+                <Textarea
+                  value={bioDraft}
+                  onChange={(e) => setBioDraft(e.target.value)}
+                  placeholder="Conte às empresas o que sabe fazer..."
+                  maxLength={300}
+                  rows={5}
+                  className="rounded-xl"
+                />
+                <p className="text-right text-[11px] text-muted-foreground">{bioDraft.length}/300</p>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setBioOpen(false)} className="rounded-xl">
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleSaveBio} disabled={savingBio} className="rounded-xl">
+                    {savingBio ? "A guardar..." : "Guardar"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )
+        }
+      >
+        Sobre
+      </SectionTitle>
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="text-sm text-muted-foreground">
-          {me.bio ||
+          {account?.bio ||
+            me.bio ||
             "Ainda não escreveu uma biografia. Conte às empresas o que sabe fazer para receber mais convites."}
         </p>
         <div className="mt-3 border-t border-border pt-3">

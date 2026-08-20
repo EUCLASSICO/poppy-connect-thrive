@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BusinessRouteImport } from './routes/business'
 import { Route as KycRouteImport } from './routes/kyc'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MessagesRouteImport } from './routes/messages'
@@ -25,6 +26,11 @@ import { Route as JobsJobIdProposalRouteImport } from './routes/jobs.$jobId.prop
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KycRoute = KycRouteImport.update({
@@ -85,6 +91,7 @@ const JobsJobIdProposalRoute = JobsJobIdProposalRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/business': typeof BusinessRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/business': typeof BusinessRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/business': typeof BusinessRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/business'
     | '/kyc'
     | '/login'
     | '/messages'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/business'
     | '/kyc'
     | '/login'
     | '/messages'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/business'
     | '/kyc'
     | '/login'
     | '/messages'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BusinessRoute: typeof BusinessRoute
   KycRoute: typeof KycRoute
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kyc': {
@@ -288,6 +308,7 @@ const JobsJobIdRouteWithChildren = JobsJobIdRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BusinessRoute: BusinessRoute,
   KycRoute: KycRoute,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,

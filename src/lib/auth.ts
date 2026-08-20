@@ -43,6 +43,25 @@ export type PaymentMethod = {
   /** Usado por Unitel Money */
   phone?: string;
   createdAt: string;
+  /** Confirmado pelo dono da conta como método válido para levantamentos. */
+  verified?: boolean;
+};
+
+export type WithdrawalStatus = "pendente" | "rejeitado";
+
+export type Withdrawal = {
+  id: string;
+  /** Número de referência mostrado no comprovativo. */
+  reference: string;
+  amount: number;
+  methodId: string;
+  methodType: PaymentMethodType;
+  methodLabel: string;
+  methodAccount: string;
+  status: WithdrawalStatus;
+  requestedAt: string;
+  /** requestedAt + 48h — quando o levantamento fica disponível. */
+  availableAt: string;
 };
 
 export type PoppyUser = {
@@ -63,6 +82,7 @@ export type PoppyUser = {
   bio?: string;
   skills?: string[];
   paymentMethods?: PaymentMethod[];
+  withdrawals?: Withdrawal[];
   /** Data de criação da conta, em ISO 8601. Contas antigas podem não ter este campo. */
   createdAt?: string;
 };
@@ -213,6 +233,65 @@ export function removePaymentMethod(id: string, methodId: string): PoppyUser | n
   users[index] = updated;
   writeUsers(users);
   return updated;
+}
+
+/** Confirma que o utilizador é dono do método — passa a poder ser usado em levantamentos. */
+export function verifyPaymentMethod(id: string, methodId: string): PoppyUser | null {
+  const users = readUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+  const user = users[index] as PoppyUser;
+  const updated: PoppyUser = {
+    ...user,
+    paymentMethods: (user.paymentMethods ?? []).map((m) => (m.id === methodId ? { ...m, verified: true } : m)),
+  };
+  users[index] = updated;
+  writeUsers(users);
+  return updated;
+}
+
+/** Gera uma referência de comprovativo, ex: POP-SAQ-482913 */
+function generateWithdrawalReference(): string {
+  const random = Math.floor(100000 + Math.random() * 900000);
+  return `POP-SAQ-${random}`;
+}
+
+/**
+ * Regista um pedido de levantamento com um método já verificado.
+ * Fica "pendente" durante 48 horas — a UI calcula quando fica disponível
+ * comparando com `availableAt`, já que ainda não há back-end a processar isto.
+ */
+export function requestWithdrawal(
+  id: string,
+  amount: number,
+  methodId: string,
+): { user: PoppyUser; withdrawal: Withdrawal } | null {
+  const users = readUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+  const user = users[index] as PoppyUser;
+  const method = (user.paymentMethods ?? []).find((m) => m.id === methodId);
+  if (!method || !method.verified) return null;
+
+  const requestedAt = new Date();
+  const availableAt = new Date(requestedAt.getTime() + 48 * 60 * 60 * 1000);
+  const withdrawal: Withdrawal = {
+    id: `wd_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    reference: generateWithdrawalReference(),
+    amount,
+    methodId: method.id,
+    methodType: method.type,
+    methodLabel: method.accountName,
+    methodAccount: method.iban ?? method.phone ?? "",
+    status: "pendente",
+    requestedAt: requestedAt.toISOString(),
+    availableAt: availableAt.toISOString(),
+  };
+
+  const updated: PoppyUser = { ...user, withdrawals: [withdrawal, ...(user.withdrawals ?? [])] };
+  users[index] = updated;
+  writeUsers(users);
+  return { user: updated, withdrawal };
 }
 
 export function getCurrentUser(): PoppyUser | null {

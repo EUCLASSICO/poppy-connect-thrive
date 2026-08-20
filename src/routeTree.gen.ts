@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
@@ -51,6 +52,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
+  '/projects': typeof ProjectsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
+  '/projects': typeof ProjectsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
+  '/projects': typeof ProjectsRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/post'
     | '/profile'
+    | '/projects'
     | '/settings'
     | '/signup'
     | '/jobs/$jobId'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/post'
     | '/profile'
+    | '/projects'
     | '/settings'
     | '/signup'
     | '/jobs/$jobId'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/post'
     | '/profile'
+    | '/projects'
     | '/settings'
     | '/signup'
     | '/jobs/$jobId'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   MessagesRoute: typeof MessagesRoute
   PostRoute: typeof PostRoute
   ProfileRoute: typeof ProfileRoute
+  ProjectsRoute: typeof ProjectsRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
   JobsJobIdRoute: typeof JobsJobIdRouteWithChildren
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -273,6 +293,7 @@ const rootRouteChildren: RootRouteChildren = {
   MessagesRoute: MessagesRoute,
   PostRoute: PostRoute,
   ProfileRoute: ProfileRoute,
+  ProjectsRoute: ProjectsRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
   JobsJobIdRoute: JobsJobIdRouteWithChildren,

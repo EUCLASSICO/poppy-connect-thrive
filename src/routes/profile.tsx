@@ -43,9 +43,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { SuccessRateRing } from "@/components/poppy/SuccessRateRing";
 import { deleteAccount, getCurrentUser, logout, updateProfile, type KycStatus, type PoppyUser } from "@/lib/auth";
 import { resizeImageToDataUrl } from "@/lib/image";
-import { formatKz, levels, me } from "@/lib/poppy-data";
+import { formatKz, levels, me, successRateRules } from "@/lib/poppy-data";
 
 const kycLabel: Record<KycStatus, string> = {
   "não verificado": "Verificar identidade",
@@ -262,6 +263,29 @@ function ProfilePage() {
         </div>
       </div>
 
+      {/* Taxa de sucesso — reputação do trabalhador. Sobe quando uma tarefa é
+          aprovada; desce com tarefas não aprovadas ou tarefas acumuladas por
+          confirmar. Abaixo de 50% a conta fica temporariamente impedida de
+          aceitar novas tarefas, até a taxa recuperar. */}
+      <SectionTitle>Taxa de sucesso</SectionTitle>
+      <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
+        <SuccessRateRing value={me.successRate} />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold">
+            {me.successRate <= successRateRules.minToAcceptTasks
+              ? "Conta temporariamente limitada"
+              : me.successRate >= 90
+                ? "Excelente reputação"
+                : "Boa reputação"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {me.successRate <= successRateRules.minToAcceptTasks
+              ? `Abaixo de ${successRateRules.minToAcceptTasks}% não é possível aceitar novas tarefas. Conclua as tarefas pendentes para recuperar.`
+              : "Sobe quando uma tarefa é aprovada e desce com tarefas não aprovadas ou acumuladas por confirmar."}
+          </p>
+        </div>
+      </div>
+
       {/* Estatísticas */}
       <section className="mt-3 grid grid-cols-2 gap-2">
         <div className="rounded-2xl border border-border bg-card p-3 text-center">
@@ -375,20 +399,6 @@ function ProfilePage() {
             me.bio ||
             "Ainda não escreveu uma biografia. Conte às empresas o que sabe fazer para receber mais convites."}
         </p>
-        <div className="mt-3 border-t border-border pt-3">
-          <p className="text-xs font-bold">Habilidades</p>
-          {me.skills.length > 0 ? (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {me.skills.map((skill) => (
-                <Badge key={skill} variant="secondary" className="rounded-full px-3 py-1 font-medium">
-                  {skill}
-                </Badge>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-1 text-xs text-muted-foreground">Ainda não adicionou habilidades.</p>
-          )}
-        </div>
       </div>
 
 

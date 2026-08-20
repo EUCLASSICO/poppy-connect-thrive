@@ -72,6 +72,19 @@ export const me = {
   earnings: 0,
   bio: "",
   skills: [] as string[],
+  // Taxa de sucesso: começa em 100 (sem incidentes). Sobe quando uma tarefa
+  // é aprovada; desce quando uma tarefa não é aprovada ou quando há muitas
+  // tarefas acumuladas por confirmar. A partir do Supabase, isto deve ser
+  // calculado no servidor a cada mudança de estado de uma tarefa.
+  successRate: 100,
+};
+
+/** Regras da taxa de sucesso — usar sempre que uma tarefa mudar de estado. */
+export const successRateRules = {
+  onTaskApproved: 4,
+  onTaskRejected: -12,
+  onTasksBacklog: -6, // aplicado quando há tarefas acumuladas por confirmar
+  minToAcceptTasks: 50,
 };
 
 export const formatKz = (value: number) =>

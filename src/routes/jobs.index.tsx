@@ -1,22 +1,21 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { JobCard } from "@/components/poppy/JobCard";
 import { Screen } from "@/components/poppy/Screen";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
-import { categories, formatKz, jobs } from "@/lib/poppy-data";
+import { formatKz, jobs } from "@/lib/poppy-data";
 
-type Search = { category?: string };
+type Search = { category?: string | undefined };
 
 export const Route = createFileRoute("/jobs/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    category: typeof search.category === "string" ? search.category : undefined,
+    category: typeof search['category'] === "string" ? (search['category'] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -38,7 +37,7 @@ const deadlines = ["Qualquer", "Até 7 dias", "Até 15 dias", "Mais de 15 dias"]
 
 function JobsPage() {
   const { category } = Route.useSearch();
-  const navigate = useNavigate({ from: "/jobs" });
+  const navigate = useNavigate({ from: "/jobs/" });
   const [query, setQuery] = useState("");
   const [type, setType] = useState<(typeof types)[number]>("Todos");
   const [level, setLevel] = useState<(typeof levels)[number]>("Todos");
@@ -69,7 +68,6 @@ function JobsPage() {
     [category, query, type, level, deadline, minBudget, maxDistance],
   );
 
-  const activeCategory = categories.find((c) => c.id === category);
 
   return (
     <Screen>
@@ -115,7 +113,7 @@ function JobsPage() {
                     value={[minBudget]}
                     max={1000000}
                     step={20000}
-                    onValueChange={(v) => setMinBudget(v[0])}
+                    onValueChange={(v) => setMinBudget(v[0] ?? 0)}
                   />
                 </div>
                 <div>
@@ -125,7 +123,7 @@ function JobsPage() {
                     value={[maxDistance]}
                     max={50}
                     step={1}
-                    onValueChange={(v) => setMaxDistance(v[0])}
+                    onValueChange={(v) => setMaxDistance(v[0] ?? 50)}
                   />
                 </div>
               </div>
@@ -138,31 +136,14 @@ function JobsPage() {
           placeholder="Procurar por título, empresa ou habilidade"
           className="mt-3 rounded-xl"
         />
-        <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
-          <Chip active={!category} onClick={() => navigate({ search: {} })}>
-            Todas
-          </Chip>
-          {categories.map((c) => (
-            <Chip key={c.id} active={category === c.id} onClick={() => navigate({ search: { category: c.id } })}>
-              {c.name}
-            </Chip>
-          ))}
-        </div>
       </header>
 
       <div className="mb-3 flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
           {results.length} trabalho{results.length === 1 ? "" : "s"} encontrado{results.length === 1 ? "" : "s"}
         </p>
-        {activeCategory && (
-          <Badge variant="secondary" className="rounded-full">
-            {activeCategory.name}
-            <button onClick={() => navigate({ search: {} })} aria-label="Remover filtro">
-              <X className="ml-1 size-3" />
-            </button>
-          </Badge>
-        )}
       </div>
+
 
       <div className="space-y-3">
         {results.map((job) => (
@@ -187,7 +168,7 @@ function JobsPage() {
               variant="outline"
               size="sm"
               className="mt-4 rounded-xl"
-              onClick={() => navigate({ search: {} })}
+              onClick={() => navigate({ search: { category: undefined } })}
             >
               Limpar filtros
             </Button>

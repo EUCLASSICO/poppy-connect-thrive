@@ -100,80 +100,58 @@ function ProfilePage() {
         </Link>
       </header>
 
-      {/* Cabeçalho do perfil */}
-      <section className="bg-gradient-primary shadow-float mt-1 rounded-3xl p-5 text-primary-foreground">
-        <div className="flex flex-col items-center text-center">
-          <Avatar className="size-20 border-4 border-primary-foreground/30">
-            <AvatarFallback className="bg-primary-foreground/15 text-2xl font-bold text-primary-foreground">
+      {/* Cabeçalho do perfil — cartão limpo, informação essencial */}
+      <section className="shadow-card mt-1 rounded-3xl border border-border bg-card p-5">
+        <div className="flex items-center gap-4">
+          <Avatar className="size-16 border border-border">
+            <AvatarFallback className="bg-primary-soft text-xl font-bold text-primary">
               {initials(name)}
             </AvatarFallback>
           </Avatar>
-          <div className="mt-4 flex items-center gap-2">
-            <p className="text-lg font-bold">{name}</p>
-            {account?.kycStatus === "verificado" && (
-              <span
-                className="stamp-badge size-9 shrink-0 text-[9px] font-bold text-primary-foreground"
-                title="Identidade verificada"
-              >
-                OK
-              </span>
-            )}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="truncate text-base font-bold">{name}</p>
+              {account?.kycStatus === "verificado" && (
+                <span
+                  className="stamp-badge size-8 shrink-0 text-[9px] font-bold text-primary"
+                  title="Identidade verificada"
+                >
+                  OK
+                </span>
+              )}
+            </div>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              {account ? `@${account.username}` : me.role}
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <Badge variant="secondary" className="rounded-full text-[10px]">
+                Nível {me.level}
+              </Badge>
+              {account && (
+                <Badge variant="outline" className="rounded-full text-[10px]">
+                  {account.kycStatus}
+                </Badge>
+              )}
+            </div>
           </div>
-          {account && <Badge className="mt-2 border-transparent bg-primary-foreground/15 text-primary-foreground">{account.id}</Badge>}
-          <p className="mt-2 text-sm text-primary-foreground/85">{me.role}</p>
           <Link
             to="/settings"
-            className="mt-3 flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-4 py-1.5 text-xs font-semibold transition-colors hover:bg-primary-foreground/25"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
+            aria-label="Definições"
           >
-            <Settings className="size-3.5" /> Definições
+            <Settings className="size-4" />
           </Link>
         </div>
 
-        <div className="mt-5 flex items-center justify-between text-xs">
-          <span className="font-semibold">Nível {me.level}</span>
-          <span className="text-primary-foreground/80">{me.levelProgress}% para o próximo nível</span>
+        <div className="mt-4 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span className="font-semibold text-foreground">Progresso do nível</span>
+          <span>{me.levelProgress}% para {levels[Math.min(levelIndex + 1, levels.length - 1)]}</span>
         </div>
-        <Progress value={me.levelProgress} className="mt-2 h-2 bg-primary-foreground/20" />
+        <Progress value={me.levelProgress} className="mt-2 h-2" />
       </section>
 
-      {/* Dados da conta */}
-      {account && (
-        <section className="mt-4 space-y-2 rounded-2xl border border-border bg-card p-4 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Mail className="size-4 shrink-0" />
-            <span className="truncate">{account.email}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <MapPin className="size-4 shrink-0" />
-            <span className="truncate">{account.country}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="flex size-4 shrink-0 items-center justify-center text-xs font-bold">@</span>
-            <span className="truncate">{account.username}</span>
-          </div>
-        </section>
-      )}
-
-      {/* Verificação de identidade */}
-      {account && (
-        <Link
-          to="/kyc"
-          className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-secondary"
-        >
-          <span className="bg-primary-soft flex size-10 shrink-0 items-center justify-center rounded-xl text-primary">
-            <ShieldCheck className="size-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">{kycLabel[account.kycStatus]}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">BI, selfie, morada, telefone e assinatura</p>
-          </div>
-          <Badge variant={kycVariant[account.kycStatus]}>{account.kycStatus}</Badge>
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
-        </Link>
-      )}
-
       {/* Estatísticas */}
-      <section className="mt-4 grid grid-cols-3 gap-2">
+      <section className="mt-3 grid grid-cols-3 gap-2">
         <div className="rounded-2xl border border-border bg-card p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-warning">
             <Star className="size-4 fill-current" />
@@ -196,7 +174,8 @@ function ProfilePage() {
       </section>
 
       {/* Carteira */}
-      <div className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-card p-4">
+      <SectionTitle>Carteira</SectionTitle>
+      <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4">
         <div className="flex items-center gap-3">
           <span className="bg-primary-soft flex size-10 items-center justify-center rounded-xl text-primary">
             <Wallet className="size-5" />
@@ -209,28 +188,49 @@ function ProfilePage() {
         <p className="font-display text-base font-bold">{formatKz(me.balance)}</p>
       </div>
 
-      {/* Sobre */}
-      <SectionTitle>Sobre</SectionTitle>
-      {me.bio ? (
-        <p className="text-sm text-muted-foreground">{me.bio}</p>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          Ainda não escreveu uma biografia. Conte às empresas o que sabe fazer para receber mais convites.
-        </p>
+      {/* Conta */}
+      {account && (
+        <>
+          <SectionTitle>Conta</SectionTitle>
+          <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+            <Row icon={Mail} label="Email" value={account.email} />
+            <Row icon={MapPin} label="País" value={account.country} />
+            <Link to="/kyc" className="flex items-center gap-3 p-4 transition-colors hover:bg-secondary">
+              <ShieldCheck className="size-4 shrink-0 text-primary" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">{kycLabel[account.kycStatus]}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">BI, selfie, morada, telefone e assinatura</p>
+              </div>
+              <Badge variant={kycVariant[account.kycStatus]}>{account.kycStatus}</Badge>
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+            </Link>
+          </div>
+        </>
       )}
 
-      <SectionTitle>Habilidades</SectionTitle>
-      {me.skills.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {me.skills.map((skill) => (
-            <Badge key={skill} variant="secondary" className="rounded-full px-3 py-1 font-medium">
-              {skill}
-            </Badge>
-          ))}
+      {/* Sobre */}
+      <SectionTitle>Sobre</SectionTitle>
+      <div className="rounded-2xl border border-border bg-card p-4">
+        <p className="text-sm text-muted-foreground">
+          {me.bio ||
+            "Ainda não escreveu uma biografia. Conte às empresas o que sabe fazer para receber mais convites."}
+        </p>
+        <div className="mt-3 border-t border-border pt-3">
+          <p className="text-xs font-bold">Habilidades</p>
+          {me.skills.length > 0 ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {me.skills.map((skill) => (
+                <Badge key={skill} variant="secondary" className="rounded-full px-3 py-1 font-medium">
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-1 text-xs text-muted-foreground">Ainda não adicionou habilidades.</p>
+          )}
         </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">Ainda não adicionou habilidades.</p>
-      )}
+      </div>
+
 
       {/* Ações */}
       <div className="mt-6 space-y-2">
@@ -281,5 +281,23 @@ function ProfilePage() {
         </AlertDialog>
       </div>
     </Screen>
+  );
+}
+
+function Row({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Mail;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 p-4">
+      <Icon className="size-4 shrink-0 text-muted-foreground" />
+      <p className="text-sm font-semibold">{label}</p>
+      <p className="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">{value}</p>
+    </div>
   );
 }

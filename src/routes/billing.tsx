@@ -7,9 +7,9 @@ import {
   Clock,
   FileText,
   Plus,
+  Settings,
   ShieldCheck,
   Trash2,
-  Wallet,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   addPaymentMethod,
   getCurrentUser,
@@ -41,7 +42,7 @@ import {
   type PoppyUser,
   type Withdrawal,
 } from "@/lib/auth";
-import { formatKz, me } from "@/lib/poppy-data";
+import { formatKz, levels, me } from "@/lib/poppy-data";
 import { maskAccount, paymentMethodInfo, paymentMethodOrder } from "@/lib/payment-methods";
 
 export const Route = createFileRoute("/billing")({
@@ -85,28 +86,26 @@ function BillingPage() {
     setPendingDelete(null);
   }
 
-  return (
-    <Screen>
-      <header className="sticky top-0 z-20 -mx-4 mb-4 flex items-center gap-3 border-b border-border/70 bg-background/85 px-4 py-3 backdrop-blur-lg">
-        <Link
-          to="/profile"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
-          aria-label="Voltar"
-        >
-          <ChevronLeft className="size-5" />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-base font-bold">Carteira</h1>
-          <p className="truncate text-xs text-muted-foreground">Saldo, levantamentos e métodos de pagamento</p>
-        </div>
-      </header>
+  const levelIndex = Math.max(levels.indexOf(me.level), 0);
+  const nextLevel = levels[Math.min(levelIndex + 1, levels.length - 1)];
 
-      {/* Carteira */}
-      <section className="bg-gradient-primary shadow-float rounded-3xl p-5 text-primary-foreground">
-        <div className="flex items-center gap-2 text-xs opacity-85">
-          <Wallet className="size-4" /> Saldo disponível
+  return (
+    <Screen padded={false}>
+      {/* Topo em bloco de cor — saldo, ações e navegação, como no cartão de referência */}
+      <section className="bg-gradient-primary rounded-b-3xl px-4 pb-6 pt-3 text-primary-foreground">
+        <div className="flex items-center justify-between">
+          <Link
+            to="/profile"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-primary-foreground"
+            aria-label="Voltar"
+          >
+            <ChevronLeft className="size-5" />
+          </Link>
+          <span className="rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold">Nível {me.level}</span>
         </div>
-        <p className="font-display mt-1 text-3xl font-bold">{formatKz(me.balance)}</p>
+
+        <p className="mt-5 text-xs opacity-85">Saldo disponível</p>
+        <p className="font-display mt-1 text-4xl font-bold">{formatKz(me.balance)}</p>
         <div className="mt-4 flex items-center gap-6 text-xs">
           <div>
             <p className="opacity-80">Pendente</p>
@@ -117,15 +116,43 @@ function BillingPage() {
             <p className="font-semibold">{formatKz(me.earnings)}</p>
           </div>
         </div>
-        <Button
-          onClick={() => setWithdrawOpen(true)}
-          className="mt-4 w-full gap-1.5 rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-        >
-          <ArrowDownToLine className="size-4" /> Retirar
-        </Button>
+
+        <div className="mt-5 flex gap-2">
+          <Button
+            onClick={() => setWithdrawOpen(true)}
+            className="flex-1 gap-1.5 rounded-xl bg-white/15 text-primary-foreground hover:bg-white/25"
+          >
+            <ArrowDownToLine className="size-4" /> Retirar
+          </Button>
+          <Link
+            to="/settings"
+            className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-primary-foreground transition-colors hover:bg-white/25"
+            aria-label="Definições"
+          >
+            <Settings className="size-4" />
+          </Link>
+        </div>
       </section>
 
-      {/* Métodos de pagamento */}
+      <div className="px-4">
+        {/* Objetivo — progresso até ao próximo nível Poppy */}
+        <SectionTitle
+          action={
+            <Link to="/profile" className="text-xs font-semibold text-primary">
+              Gerir
+            </Link>
+          }
+        >
+          Objetivo
+        </SectionTitle>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">
+            {100 - me.levelProgress}% para o nível {nextLevel}
+          </p>
+          <Progress value={me.levelProgress} className="mt-2 h-2" />
+        </div>
+
+        {/* Métodos de pagamento */}
       <SectionTitle
         action={
           account && (
@@ -254,6 +281,7 @@ function BillingPage() {
           <p className="text-sm text-muted-foreground">Ainda não fez nenhum levantamento.</p>
         </div>
       )}
+      </div>
 
       {account && (
         <AddPaymentMethodDialog open={addOpen} onOpenChange={setAddOpen} account={account} onSaved={setAccount} />

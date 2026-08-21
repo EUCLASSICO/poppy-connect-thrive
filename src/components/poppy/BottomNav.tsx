@@ -1,6 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Briefcase, Home, MessageCircle, Plus, User } from "lucide-react";
+import { useEffect, useState } from "react";
 
+import { getCurrentUser } from "@/lib/auth";
+import { unreadNotificationsCount } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -13,6 +16,13 @@ const items = [
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    const account = getCurrentUser();
+    if (!account) return;
+    setUnread(unreadNotificationsCount(account.id));
+  }, [pathname]);
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
@@ -41,7 +51,12 @@ export function BottomNav() {
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className={cn("size-5", active && "stroke-[2.4]")} />
+                <span className="relative">
+                  <Icon className={cn("size-5", active && "stroke-[2.4]")} />
+                  {to === "/messages" && unread > 0 && (
+                    <span className="absolute -right-1 -top-1 size-2 rounded-full bg-destructive" />
+                  )}
+                </span>
                 <span className="text-[10px] font-semibold">{label}</span>
               </Link>
             </li>

@@ -1,3 +1,5 @@
+import { addNotification, ensureSupportThread } from "@/lib/notifications";
+
 export type Country =
   | "Angola"
   | "Brasil"
@@ -33,6 +35,12 @@ export type KycDocuments = {
 };
 
 export type PaymentMethodType = "paypay" | "unitel_money" | "bank_transfer";
+
+const paymentMethodLabels: Record<PaymentMethodType, string> = {
+  paypay: "PayPay África",
+  unitel_money: "Unitel Money",
+  bank_transfer: "Transferência bancária",
+};
 
 export type PaymentMethod = {
   id: string;
@@ -129,6 +137,8 @@ export function createUser(data: Omit<PoppyUser, "id" | "kycStatus" | "createdAt
   users.push(user);
   writeUsers(users);
   window.localStorage.setItem(SESSION_KEY, user.id);
+  ensureSupportThread(user.id, user.fullName);
+  addNotification(user.id, "Bem-vindo(a) à Poppy 👋", "A sua conta foi criada. Explore tarefas e trabalhos disponíveis.");
   return user;
 }
 
@@ -165,13 +175,21 @@ export function setSecondaryEmail(id: string, secondaryEmail: string): PoppyUser
 
 /** Envia os documentos de KYC (BI frente/verso, selfie com BI, assinatura, morada e telefone) — mock, passa a "pendente" */
 export function submitKycDocuments(id: string, documents: KycDocuments): PoppyUser | null {
-  return updateUser(id, {
+  const updated = updateUser(id, {
     kycStatus: "pendente",
     kycDocuments: documents,
     kycSubmittedAt: new Date().toISOString(),
     address: documents.address,
     phone: documents.phone,
   });
+  if (updated) {
+    addNotification(
+      id,
+      "Verificação em análise",
+      "Recebemos os seus documentos. A verificação de identidade costuma demorar até 48 horas.",
+    );
+  }
+  return updated;
 }
 
 /** Apaga definitivamente a conta e a sessão associada */
@@ -217,6 +235,7 @@ export function addPaymentMethod(
   const updated: PoppyUser = { ...user, paymentMethods: [...(user.paymentMethods ?? []), newMethod] };
   users[index] = updated;
   writeUsers(users);
+  addNotification(id, "Método de pagamento adicionado", `${paymentMethodLabels[method.type]} foi guardado na sua conta.`);
   return updated;
 }
 
@@ -247,6 +266,10 @@ export function verifyPaymentMethod(id: string, methodId: string): PoppyUser | n
   };
   users[index] = updated;
   writeUsers(users);
+  const method = updated.paymentMethods?.find((m) => m.id === methodId);
+  if (method) {
+    addNotification(id, "Método de pagamento verificado", `${paymentMethodLabels[method.type]} já pode ser usado em levantamentos.`);
+  }
   return updated;
 }
 
@@ -291,6 +314,11 @@ export function requestWithdrawal(
   const updated: PoppyUser = { ...user, withdrawals: [withdrawal, ...(user.withdrawals ?? [])] };
   users[index] = updated;
   writeUsers(users);
+  addNotification(
+    id,
+    "Levantamento solicitado",
+    `Pedido de ${withdrawal.amount.toLocaleString("pt-AO")} Kz via ${paymentMethodLabels[method.type]} — referência ${withdrawal.reference}. Disponível em até 48 horas.`,
+  );
   return { user: updated, withdrawal };
 }
 

@@ -99,7 +99,7 @@ function Home() {
         </Link>
 
         <Link
-          to="/settings"
+          to="/messages"
           className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-primary-soft hover:text-primary"
           aria-label="Notificações"
         >

@@ -153,9 +153,9 @@ function ProfilePage() {
       <header className="sticky top-0 z-20 -mx-4 flex items-center justify-between bg-background/85 px-4 py-3 backdrop-blur-lg">
         <h1 className="text-base font-bold">Perfil</h1>
         <Link
-          to="/settings"
+          to="/messages"
           className="flex size-9 items-center justify-center rounded-full bg-secondary"
-          aria-label="Configurações"
+          aria-label="Notificações"
         >
           <Bell className="size-5" />
         </Link>

@@ -14,7 +14,6 @@ import { Route as BillingRouteImport } from './routes/billing'
 import { Route as BusinessRouteImport } from './routes/business'
 import { Route as KycRouteImport } from './routes/kyc'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProjectsRouteImport } from './routes/projects'
@@ -23,6 +22,9 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as MessagesIndexRouteImport } from './routes/messages.index'
+import { Route as MessagesNotificationsRouteImport } from './routes/messages.notifications'
+import { Route as MessagesSupportRouteImport } from './routes/messages.support'
 import { Route as JobsJobIdProposalRouteImport } from './routes/jobs.$jobId.proposal'
 
 const IndexRoute = IndexRouteImport.update({
@@ -48,11 +50,6 @@ const KycRoute = KycRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostRoute = PostRouteImport.update({
@@ -95,6 +92,21 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/jobs/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MessagesIndexRoute = MessagesIndexRouteImport.update({
+  id: '/messages/',
+  path: '/messages/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesNotificationsRoute = MessagesNotificationsRouteImport.update({
+  id: '/messages/notifications',
+  path: '/messages/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesSupportRoute = MessagesSupportRouteImport.update({
+  id: '/messages/support',
+  path: '/messages/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsJobIdProposalRoute = JobsJobIdProposalRouteImport.update({
   id: '/proposal',
   path: '/proposal',
@@ -107,7 +119,6 @@ export interface FileRoutesByFullPath {
   '/business': typeof BusinessRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
@@ -115,7 +126,10 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/welcome': typeof WelcomeRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
+  '/messages/notifications': typeof MessagesNotificationsRoute
+  '/messages/support': typeof MessagesSupportRoute
   '/jobs/': typeof JobsIndexRoute
+  '/messages/': typeof MessagesIndexRoute
   '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
 }
 export interface FileRoutesByTo {
@@ -124,7 +138,6 @@ export interface FileRoutesByTo {
   '/business': typeof BusinessRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
@@ -132,7 +145,10 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/welcome': typeof WelcomeRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
+  '/messages/notifications': typeof MessagesNotificationsRoute
+  '/messages/support': typeof MessagesSupportRoute
   '/jobs': typeof JobsIndexRoute
+  '/messages': typeof MessagesIndexRoute
   '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
 }
 export interface FileRoutesById {
@@ -142,7 +158,6 @@ export interface FileRoutesById {
   '/business': typeof BusinessRoute
   '/kyc': typeof KycRoute
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
   '/post': typeof PostRoute
   '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
@@ -150,7 +165,10 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/welcome': typeof WelcomeRoute
   '/jobs/$jobId': typeof JobsJobIdRouteWithChildren
+  '/messages/notifications': typeof MessagesNotificationsRoute
+  '/messages/support': typeof MessagesSupportRoute
   '/jobs/': typeof JobsIndexRoute
+  '/messages/': typeof MessagesIndexRoute
   '/jobs/$jobId/proposal': typeof JobsJobIdProposalRoute
 }
 export interface FileRouteTypes {
@@ -161,7 +179,6 @@ export interface FileRouteTypes {
     | '/business'
     | '/kyc'
     | '/login'
-    | '/messages'
     | '/post'
     | '/profile'
     | '/projects'
@@ -169,7 +186,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/welcome'
     | '/jobs/$jobId'
+    | '/messages/notifications'
+    | '/messages/support'
     | '/jobs/'
+    | '/messages/'
     | '/jobs/$jobId/proposal'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -178,7 +198,6 @@ export interface FileRouteTypes {
     | '/business'
     | '/kyc'
     | '/login'
-    | '/messages'
     | '/post'
     | '/profile'
     | '/projects'
@@ -186,7 +205,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/welcome'
     | '/jobs/$jobId'
+    | '/messages/notifications'
+    | '/messages/support'
     | '/jobs'
+    | '/messages'
     | '/jobs/$jobId/proposal'
   id:
     | '__root__'
@@ -195,7 +217,6 @@ export interface FileRouteTypes {
     | '/business'
     | '/kyc'
     | '/login'
-    | '/messages'
     | '/post'
     | '/profile'
     | '/projects'
@@ -203,7 +224,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/welcome'
     | '/jobs/$jobId'
+    | '/messages/notifications'
+    | '/messages/support'
     | '/jobs/'
+    | '/messages/'
     | '/jobs/$jobId/proposal'
   fileRoutesById: FileRoutesById
 }
@@ -213,7 +237,6 @@ export interface RootRouteChildren {
   BusinessRoute: typeof BusinessRoute
   KycRoute: typeof KycRoute
   LoginRoute: typeof LoginRoute
-  MessagesRoute: typeof MessagesRoute
   PostRoute: typeof PostRoute
   ProfileRoute: typeof ProfileRoute
   ProjectsRoute: typeof ProjectsRoute
@@ -221,7 +244,10 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   WelcomeRoute: typeof WelcomeRoute
   JobsJobIdRoute: typeof JobsJobIdRouteWithChildren
+  MessagesNotificationsRoute: typeof MessagesNotificationsRoute
+  MessagesSupportRoute: typeof MessagesSupportRoute
   JobsIndexRoute: typeof JobsIndexRoute
+  MessagesIndexRoute: typeof MessagesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -259,13 +285,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post': {
@@ -324,6 +343,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/messages/': {
+      id: '/messages/'
+      path: '/messages'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof MessagesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages/notifications': {
+      id: '/messages/notifications'
+      path: '/messages/notifications'
+      fullPath: '/messages/notifications'
+      preLoaderRoute: typeof MessagesNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages/support': {
+      id: '/messages/support'
+      path: '/messages/support'
+      fullPath: '/messages/support'
+      preLoaderRoute: typeof MessagesSupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/$jobId/proposal': {
       id: '/jobs/$jobId/proposal'
       path: '/proposal'
@@ -352,7 +392,6 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessRoute: BusinessRoute,
   KycRoute: KycRoute,
   LoginRoute: LoginRoute,
-  MessagesRoute: MessagesRoute,
   PostRoute: PostRoute,
   ProfileRoute: ProfileRoute,
   ProjectsRoute: ProjectsRoute,
@@ -360,7 +399,10 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   WelcomeRoute: WelcomeRoute,
   JobsJobIdRoute: JobsJobIdRouteWithChildren,
+  MessagesNotificationsRoute: MessagesNotificationsRoute,
+  MessagesSupportRoute: MessagesSupportRoute,
   JobsIndexRoute: JobsIndexRoute,
+  MessagesIndexRoute: MessagesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

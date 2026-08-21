@@ -17,7 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { PoppyLogo } from "@/components/poppy/PoppyLogo";
 import { getCurrentUser } from "@/lib/auth";
 
-const HIDE_NAV = ["/welcome", "/login", "/signup"];
+const HIDE_NAV = ["/welcome", "/login", "/signup", "/messages/support"];
 // Quem não tem sessão só pode ver as boas-vindas, login e cadastro — tudo o resto exige conta.
 const PUBLIC_ROUTES = ["/welcome", "/login", "/signup"];
 

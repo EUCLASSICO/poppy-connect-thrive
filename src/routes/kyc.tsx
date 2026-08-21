@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AlertTriangle, Camera, CheckCircle2, Clock, IdCard, ShieldCheck, UserRound } from "lucide-react";
+import { AlertTriangle, Camera, Check, CheckCircle2, Clock, IdCard, Lock, PenLine, ShieldCheck, UserRound } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -69,10 +69,23 @@ function DocSlot({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-border bg-secondary/40 transition-colors hover:bg-secondary"
+        className={
+          "relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border transition-colors " +
+          (value
+            ? "border-primary/30 bg-secondary/40"
+            : "border-dashed border-border bg-secondary/40 hover:bg-secondary")
+        }
       >
         {value ? (
-          <img src={value} alt={label} className="size-full object-cover" />
+          <>
+            <img src={value} alt={label} className="size-full object-cover" />
+            <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-foreground/60 py-1.5 text-[11px] font-semibold text-background backdrop-blur-sm">
+              <Camera className="size-3" /> Trocar foto
+            </span>
+            <span className="bg-primary text-primary-foreground absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full shadow-sm">
+              <Check className="size-3" strokeWidth={3} />
+            </span>
+          </>
         ) : (
           <span className="flex flex-col items-center gap-1.5 text-muted-foreground">
             <Camera className="size-6" />
@@ -118,6 +131,21 @@ function KycPage() {
   const canEdit = account.kycStatus === "não verificado" || account.kycStatus === "rejeitado";
   const isComplete = !!(front && back && selfie && signature && address.trim() && phone.trim());
 
+  const statusTone: Record<KycStatus, { icon: typeof ShieldCheck; className: string }> = {
+    "verificado": { icon: ShieldCheck, className: "bg-success/15 text-success" },
+    "pendente": { icon: Clock, className: "bg-warning/15 text-warning" },
+    "não verificado": { icon: ShieldCheck, className: "bg-primary-soft text-primary" },
+    "rejeitado": { icon: AlertTriangle, className: "bg-destructive/15 text-destructive" },
+  };
+  const StatusIcon = statusTone[account.kycStatus].icon;
+
+  const steps = [
+    { label: "Documento", done: !!(front && back) },
+    { label: "Selfie", done: !!selfie },
+    { label: "Contacto", done: !!(address.trim() && phone.trim()) },
+    { label: "Assinatura", done: !!signature },
+  ];
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!account || !front || !back || !selfie || !signature) {
@@ -154,10 +182,10 @@ function KycPage() {
       <ScreenHeader title="Verificação de identidade" subtitle={account.id} back="/settings" />
 
       {/* Estado atual */}
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="shadow-card rounded-2xl border border-border bg-card p-4">
         <div className="flex items-start gap-3">
-          <span className="bg-primary-soft flex size-10 shrink-0 items-center justify-center rounded-xl text-primary">
-            <ShieldCheck className="size-5" />
+          <span className={"flex size-10 shrink-0 items-center justify-center rounded-xl " + statusTone[account.kycStatus].className}>
+            <StatusIcon className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -187,16 +215,41 @@ function KycPage() {
       </div>
 
       {account.kycStatus === "verificado" && (
-        <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-          <CheckCircle2 className="size-5 shrink-0 text-primary" />
+        <div className="shadow-card mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+          <CheckCircle2 className="size-5 shrink-0 text-success" />
           A sua conta está totalmente verificada.
         </div>
       )}
 
       {account.kycStatus === "pendente" && (
-        <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-          <Clock className="size-5 shrink-0 text-primary" />
+        <div className="shadow-card mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+          <Clock className="size-5 shrink-0 text-warning" />
           Os documentos enviados estão em análise. Volte aqui mais tarde.
+        </div>
+      )}
+
+      {canEdit && (
+        <div className="mt-4 flex items-center gap-1.5">
+          {steps.map((step, i) => (
+            <div key={step.label} className="flex flex-1 items-center gap-1.5">
+              <div className="flex flex-1 flex-col items-center gap-1.5">
+                <span
+                  className={
+                    "flex size-6 items-center justify-center rounded-full text-[11px] font-bold transition-colors " +
+                    (step.done ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground")
+                  }
+                >
+                  {step.done ? <Check className="size-3.5" strokeWidth={3} /> : i + 1}
+                </span>
+                <span className={"text-[10px] font-medium " + (step.done ? "text-foreground" : "text-muted-foreground")}>
+                  {step.label}
+                </span>
+              </div>
+              {i < steps.length - 1 && (
+                <div className={"mb-4 h-0.5 w-full flex-1 rounded-full " + (steps[i + 1]?.done || step.done ? "bg-primary/50" : "bg-secondary")} />
+              )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -225,7 +278,7 @@ function KycPage() {
           />
 
           <SectionTitle>Contacto</SectionTitle>
-          <div className="space-y-4 rounded-2xl border border-border bg-card p-4">
+          <div className="shadow-card space-y-4 rounded-2xl border border-border bg-card p-4">
             <div>
               <Label htmlFor="address" className="flex items-center gap-1.5">
                 <IdCard className="size-3.5" /> Endereço
@@ -254,11 +307,16 @@ function KycPage() {
           </div>
 
           <SectionTitle>Assinatura digital</SectionTitle>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="mb-3 text-xs text-muted-foreground">
-              Assine abaixo para confirmar que os dados enviados são verdadeiros e pertencem a si.
+          <div className="shadow-card rounded-2xl border border-border bg-card p-4">
+            <p className="mb-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <PenLine className="size-3.5 shrink-0" /> Assine abaixo para confirmar que os dados enviados são verdadeiros e pertencem a si.
             </p>
             <SignaturePad value={signature} onChange={setSignature} />
+          </div>
+
+          <div className="flex items-start gap-2.5 rounded-2xl border border-border/70 bg-secondary/40 p-3.5 text-xs text-muted-foreground">
+            <Lock className="mt-0.5 size-3.5 shrink-0 text-primary" />
+            Os seus documentos são encriptados e usados apenas para confirmar a sua identidade. Nunca são partilhados com terceiros.
           </div>
 
           <Button type="submit" className="w-full rounded-xl" size="lg" disabled={!isComplete || submitting}>

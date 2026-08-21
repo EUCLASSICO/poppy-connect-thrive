@@ -14,13 +14,202 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          account_name: string
+          created_at: string
+          iban: string | null
+          id: string
+          phone: string | null
+          type: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          account_name: string
+          created_at?: string
+          iban?: string | null
+          id?: string
+          phone?: string | null
+          type: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          account_name?: string
+          created_at?: string
+          iban?: string | null
+          id?: string
+          phone?: string | null
+          type?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          bio: string | null
+          country: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          kyc_documents: Json | null
+          kyc_note: string | null
+          kyc_status: string
+          kyc_submitted_at: string | null
+          phone: string | null
+          poppy_id: string
+          secondary_email: string | null
+          skills: string[]
+          username: string
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id: string
+          kyc_documents?: Json | null
+          kyc_note?: string | null
+          kyc_status?: string
+          kyc_submitted_at?: string | null
+          phone?: string | null
+          poppy_id: string
+          secondary_email?: string | null
+          skills?: string[]
+          username: string
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          kyc_documents?: Json | null
+          kyc_note?: string | null
+          kyc_status?: string
+          kyc_submitted_at?: string | null
+          phone?: string | null
+          poppy_id?: string
+          secondary_email?: string | null
+          skills?: string[]
+          username?: string
+        }
+        Relationships: []
+      }
+      support_messages: {
+        Row: {
+          created_at: string
+          id: string
+          sender: string
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sender?: string
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sender?: string
+          text?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      withdrawals: {
+        Row: {
+          amount: number
+          available_at: string
+          id: string
+          method_account: string
+          method_id: string | null
+          method_label: string
+          method_type: string
+          reference: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          available_at?: string
+          id?: string
+          method_account?: string
+          method_id?: string | null
+          method_label: string
+          method_type: string
+          reference: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          available_at?: string
+          id?: string
+          method_account?: string
+          method_id?: string | null
+          method_label?: string
+          method_type?: string
+          reference?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      identifier_available: {
+        Args: { kind: string; value: string }
+        Returns: boolean
+      }
+      resolve_login_email: { Args: { identifier: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

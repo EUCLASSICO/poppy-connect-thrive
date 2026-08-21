@@ -171,14 +171,11 @@ function RootComponent() {
 
 function AuthCheckingScreen() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4">
-      <div className="relative flex items-center justify-center">
-        <span className="absolute size-16 animate-ping rounded-full bg-primary/15" />
-        <span className="relative flex size-14 items-center justify-center rounded-2xl bg-card shadow-card">
-          <PoppyLogo size={30} />
-        </span>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-background px-4">
+      <PoppyLogo size={34} className="animate-poppy-breathe" />
+      <div className="h-1 w-24 overflow-hidden rounded-full bg-secondary">
+        <div className="h-full w-1/3 animate-poppy-loading-bar rounded-full bg-primary" />
       </div>
-      <p className="text-sm font-medium text-muted-foreground">A carregar…</p>
     </div>
   );
 }
